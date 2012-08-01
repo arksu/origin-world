@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="a1client" default="default">
+	<property name="jar" value="work\client_original.jar" />
+	<property name="obfjar" value="work\client.jar" />
+	<property name="upd_jar" value="work_updater\updater.jar" />
+
+	<target name="default" depends="jars, updater, post_clean" description="description" />
+	
+	
+	<target name="build-env" depends="clean"> 
+		<mkdir dir="dist" />
+
+		<mkdir dir="work" />
+		<mkdir dir="work/classes" />  
+		<mkdir dir="work/classes/etc" />
+
+		<mkdir dir="work"/>
+		<mkdir dir="work/src"/>
+	</target>
+
+	<target name="client" depends="build-env, prepare_src">
+		<javac srcdir="work/src" destdir="work/classes" debug="on" source="1.6" target="1.6" includeantruntime="no">
+			<classpath>
+				<pathelement path="lib/lwjgl.jar" />
+				<pathelement path="lib/lwjgl_util.jar" />
+				<pathelement path="lib/slick.jar" />
+				<pathelement path="lib/jorbis-0.0.15.jar" />
+				<pathelement path="lib/jogg-0.0.7.jar" />
+				<pathelement path="lib/OtpErlang.jar" />
+				<pathelement path="lib/log4j-1.2.15.jar" />
+			</classpath>
+			<compilerarg value="-Xlint:unchecked" />
+		</javac>
+
+		<copy todir="work/classes" file="client-log4j.xml" />
+		<copy todir="work/classes/etc" file="etc/system.fnt" />
+		<copy todir="work/classes/etc" file="etc/system_0.png" />
+		
+		<copy todir="work/classes/etc" file="etc/a1_32.png" />
+		<copy todir="work/classes/etc" file="etc/a1_16.png" />
+		<copy todir="work/classes/etc" file="etc/a1_128.png" />
+
+	</target>
+
+	<target name="jar" depends="client, build-env">
+		<jar destfile="${jar}" update="true">
+			<fileset dir="work/classes" />
+			<manifest>
+				<attribute name="Main-Class" value="a1.Main" /> 
+				<attribute name="Class-Path" value="lwjgl.jar lwjgl_util.jar slick.jar jorbis-0.0.15.jar jogg-0.0.7.jar OtpErlang.jar log4j-1.2.15.jar" />
+			</manifest>
+		</jar>
+		<chmod file="${jar}" perm="a+x" />
+	</target>
+
+	<target name="yguard" depends="jar">
+		<taskdef name="yguard" classname="com.yworks.yguard.YGuardTask" classpath="lib/yguard.jar" /> 
+		<yguard>
+			<!-- insert your yguard elements here -->
+			<inoutpair in="${jar}" out="${obfjar}" />
+			<externalclasses>
+				<pathelement location="lib/slick.jar" />
+				<pathelement location="lib/lwjgl_util.jar" />
+				<pathelement location="lib/lwjgl.jar" />
+				<pathelement location="lib/jorbis-0.0.15.jar" />
+				<pathelement location="lib/jogg-0.0.7.jar" />
+				<pathelement location="lib/OtpErlang.jar" />
+				<pathelement location="lib/log4j-1.2.15.jar" />
+				<!--<pathelement location="lib/additional/classes/"/> -->
+			</externalclasses>
+
+			<shrink logfile="shrinklog.xml">
+				<property name="error-checking" value="pedantic" />
+				<keep>
+					<method name="void main(java.lang.String[])" class="a1.Main" />
+					<class classes="public" /> 
+				</keep>
+			</shrink>
+
+			<rename mainclass="a1.Main" logfile="renamelog.xml">
+				<property name="error-checking" value="pedantic" />
+			</rename>
+
+		</yguard>
+		<copy todir="/home/arksu/new_build" file="${obfjar}" />
+	</target>
+
+	<target name="jars" depends="build-env, yguard">
+		<delete file="dist/client.jar" />
+		
+      	<copy todir="dist">
+          	<fileset dir="lib">
+        		<include name="slick.jar" />
+        		<include name="lwjgl_util.jar" />
+        		<include name="lwjgl.jar" />
+          		<include name="jorbis-0.0.15.jar" />
+          		<include name="jogg-0.0.7.jar" />
+        		<include name="OtpErlang.jar" />
+          		<include name="log4j-1.2.15.jar" />
+          	</fileset>
+      		
+      		<fileset dir="lib/native/windows">
+      			<include name="lwjgl.dll" />
+      			<include name="lwjgl64.dll" />
+      			<include name="OpenAL32.dll" />
+      			<include name="OpenAL64.dll" />
+      		</fileset>
+      		<fileset dir="etc"> 
+      			<include name="run.bat" />
+      		</fileset>
+      		
+      		<fileset dir="work">
+      			<include name="client.jar" />
+      		</fileset>
+        </copy>
+		
+    </target>   
+
+
+	<target name="svn_rev" description="Get revision number">
+		<exec executable="svn" output="svn_info_dump">
+			<arg value="info"/>
+		</exec>
+		<loadproperties srcfile="svn_info_dump"/>
+		<echo message="current revision: ${Revision}"/>
+		<delete file="svn_info_dump"/>
+	</target>
+
+	<target name="build_date">
+		<tstamp>
+			<format property="BuildDate" pattern="dd-MM-yyyy HH:mm:ss" />
+		</tstamp>
+
+		<echo message="current build date: ${BuildDate}"/>
+	</target>
+	
+	<target name="client_ver">
+		<loadfile property="ClientVersion" srcfile="client.version" />
+		<echo message="current client version: ${ClientVersion}"/>
+	</target>
+
+	<target name="prepare_src" depends="svn_rev, build_date" >
+		<copy todir="work/src">
+			<fileset dir="src">
+				<exclude name="**/a1_updater/**" />
+			</fileset>
+		</copy>
+
+		<replace file="work/src/a1/GameConst.java" token="__REVISION_NUMBER__" value="${Revision}"/>
+		<replace file="work/src/a1/GameConst.java" token="__BUILD_DATE__" value="${BuildDate}"/>
+	</target>
+
+	<target name="clean">
+		<delete dir="work" />
+		<delete dir="work_updater" />
+	</target>
+
+    <target name="post_clean">
+        <delete dir="work" />
+        <delete dir="work_updater" />
+    </target>
+
+	
+	<!-- ########################################################################### -->
+	
+	<target name="updater" depends="updater_jar">
+      	<copy todir="dist">
+      		<fileset dir="work_updater">
+      			<include name="updater.jar" />
+      		</fileset>
+		</copy>		
+	</target>
+	
+	<target name="updater_env">
+		<mkdir dir="work_updater" />
+		<mkdir dir="work_updater/classes" /> 
+
+		<mkdir dir="work_updater"/>
+		<mkdir dir="work_updater/src"/>
+	</target>
+	
+	<target name="updater_compile" depends="updater_prepare_src" >
+		<javac srcdir="work_updater/src" destdir="work_updater/classes" debug="on" source="1.6" target="1.6" includeantruntime="no">
+			<compilerarg value="-Xlint:unchecked" />
+			<!-- <compilerarg value="-Xbarda" /> -->
+		</javac>		
+	</target>
+	
+	<target name="updater_jar" depends="updater_compile, updater_env">
+		<jar destfile="${upd_jar}" update="true">
+			<fileset dir="work_updater/classes" />
+			<manifest>
+				<attribute name="Main-Class" value="a1_updater.ProgressBarMain" />
+			</manifest>
+		</jar>
+		<chmod file="${upd_jar}" perm="a+x" />
+	</target>
+
+	
+	<target name="updater_prepare_src" depends="updater_env, svn_rev, build_date" > 
+		<copy todir="work_updater/src">
+			<fileset dir="src">
+				<exclude name="**/a1/**" />
+			</fileset>
+		</copy>
+		
+		<replace file="work_updater/src/a1_updater/Const.java" token="__REVISION_NUMBER__" value="${Revision}"/>
+		<replace file="work_updater/src/a1_updater/Const.java" token="__BUILD_DATE__" value="${BuildDate}"/>
+	</target>
+	
+	
+</project>

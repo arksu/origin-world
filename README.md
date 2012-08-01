@@ -1,0 +1,1 @@
+all resources for http://origin-world.com
