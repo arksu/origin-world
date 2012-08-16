@@ -1,40 +1,28 @@
 /*
- *  This file is part of the Origin-World game client.
- *  Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
+ * This file is part of the Origin-World game client.
+ * Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3 of the License.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package a1.dialogs;
 
-import org.lwjgl.input.Keyboard;
-
-import a1.Config;
-import a1.Connection;
-import a1.DialogFactory;
-import a1.Input;
-import a1.Lang;
-import a1.Main;
-import a1.Render2D;
-import a1.gui.GUI;
-import a1.gui.GUI_Button;
-import a1.gui.GUI_Checkbox;
-import a1.gui.GUI_Edit;
-import a1.gui.GUI_Label;
-import a1.gui.GUI_Texture;
-import a1.gui.GUI_Window;
+import a1.*;
+import a1.gui.*;
 import a1.net.NetLogin;
 import a1.utils.Resource;
-import static a1.Main.*;
+import org.lwjgl.input.Keyboard;
+
+import static a1.Main.LoginConnect;
 
 public class dlg_Login extends Dialog {
 	public static dlg_Login dlg = null;
@@ -137,7 +125,7 @@ public class dlg_Login extends Dialog {
 		wnd.Center();
 		logo.SetPos(100, 100);
 		logo.CenterX();
-		btn_lang.SetPos(Config.ScreenWidth - btn_lang.size.x - 10, Config.ScreenHeight - btn_lang.size.y - 10);
+		btn_lang.SetPos(Config.getScreenWidth() - btn_lang.size.x - 10, Config.getScreenHeight() - btn_lang.size.y - 10);
 	}
 
 	public void DoHide() {

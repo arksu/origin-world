@@ -1,28 +1,25 @@
 /*
- *  This file is part of the Origin-World game client.
- *  Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
+ * This file is part of the Origin-World game client.
+ * Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3 of the License.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package a1.gui;
 
-import a1.Log;
-import a1.Coord;
-import a1.IntCoord;
-import a1.Main;
-import a1.Packet;
+import a1.*;
 import a1.gui.utils.DragInfo;
 import a1.net.NetGame;
+
 import static a1.utils.Utils.max;
 
 public class GUI_Control {
@@ -93,8 +90,13 @@ public class GUI_Control {
 				parent.child = this;
 			this.prev = parent.last_child;
 			parent.last_child = this;
+            UpdateAbsPos();
 		}
 	}
+
+    public void UnlinkChilds() {
+        while (child != null) child.Unlink();
+    }
 
 	public void Unlink() {
 		if (terminated) return;
@@ -146,6 +148,8 @@ public class GUI_Control {
 	}
  
 	public final void Update() {
+        if (!gui.game_gui_render && !((this == gui.map) || (this == gui.root) || (this == gui.custom) )) return;
+
 		if (gui.drag_info.drag_control == this) {
 			SetX(gui.mouse_pos.x - gui.drag_info.hotspot.x);
 			SetY(gui.mouse_pos.y - gui.drag_info.hotspot.y);
@@ -165,12 +169,16 @@ public class GUI_Control {
 	}
 	
 	public final void Render() {
+        // если не рендерим гуй. выходим если это не мап или руты
+        if (!gui.game_gui_render && !((this == gui.map) || (this == gui.root) || (this == gui.custom) )) return;
+
 		if (visible) {
 			DoRender();
 			if (render_childs)
 				for (GUI_Control c = child; c != null; c = c.next) {
 					c.Render();
 				}
+            DoRenderAfterChilds();
 		}
 	}
 
@@ -491,7 +499,7 @@ public class GUI_Control {
 	}
 	
 	// вывести хинт
-	public void RenderHint(int x, int y) {
+	public void RenderHint(int x, int y, int w, int h) {
 		
 	}
 	
@@ -529,6 +537,10 @@ public class GUI_Control {
 	// обработчик рендера
 	public void DoRender() {
 	}
+
+    // выполняется после рендера себя и всех детей
+    public void DoRenderAfterChilds() {
+    }
 
 	// смена позиции
 	public void DoSetPos() {

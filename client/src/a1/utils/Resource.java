@@ -1,42 +1,26 @@
 /*
- *  This file is part of the Origin-World game client.
- *  Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
+ * This file is part of the Origin-World game client.
+ * Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3 of the License.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package a1.utils;
 
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
+import a1.*;
+import a1.dialogs.dlg_Loading;
+import a1.gui.GUI_Map;
+import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.openal.Audio;
 import org.newdawn.slick.openal.AudioLoader;
 import org.newdawn.slick.opengl.Texture;
@@ -46,13 +30,13 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import a1.Config;
-import a1.Main;
-import a1.Sprite;
-import a1.WeightList;
-import a1.dialogs.dlg_Loading;
-import a1.gui.GUI_Map;
-import a1.Log;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.*;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.*;
 
 public class Resource implements Prioritized { 
 	// максимальное количество типов тайлов
@@ -63,7 +47,7 @@ public class Resource implements Prioritized {
 	private static Map<String, Resource> cache = new TreeMap<String, Resource>();
 	public static Map<String, Integer> srv_versions = new TreeMap<String, Integer>();
 	public static Map<String, Texture> textures = new TreeMap<String, Texture>();
-	public static Map<Texture, TextureData> texuture_data = new HashMap<Texture, TextureData>();
+	public static Map<Texture, TextureData> texture_data = new HashMap<Texture, TextureData>();
 	public static Map<String, ResDraw> draw_items = new TreeMap<String, ResDraw>();
 	public static List<Resource> need_load = new LinkedList<Resource>();
 	public static Map<String, ResCursor> cursors = new TreeMap<String, ResCursor>();
@@ -108,12 +92,12 @@ public class Resource implements Prioritized {
 	}
 	
 	static public TextureData getTextureData(Texture tex) {
-		TextureData t = texuture_data.get(tex);
+		TextureData t = texture_data.get(tex);
 		if (t == null) {
 			t = new TextureData();
 			t.pixel_data = tex.getTextureData();
-			t.texture = tex;
-			texuture_data.put(tex, t);
+            t.texture = tex;
+			texture_data.put(tex, t);
 		}
 		return t;
 	}
@@ -212,7 +196,7 @@ public class Resource implements Prioritized {
 			ByteArrayInputStream in = new ByteArrayInputStream(data, off, len);
 			if (Config.debug) 
 				Log.info("load texture <"+name+">");
-			Texture tex = TextureLoader.getTexture("PNG", in);
+			Texture tex = TextureLoader.getTexture("PNG", in, GL11.GL_NEAREST);
 			textures.put(name, tex);			
 		}
 		
@@ -345,8 +329,8 @@ public class Resource implements Prioritized {
 		public void init() {} 
 		
 	}
-	
-	public abstract class ResLayer extends ResBase {
+
+    public abstract class ResLayer extends ResBase {
 		// offset coord in drawable
 		public int offx;
 		public int offy;
@@ -357,6 +341,9 @@ public class Resource implements Prioritized {
 		// size
 		public int w;
 		public int h;
+        // custom tag
+        public int tag = 0;
+
 		public ResDraw owner;
 		public boolean is_error = false;
 		
@@ -486,8 +473,10 @@ public class Resource implements Prioritized {
 		public void load() throws IOException {
 			int off = 0;
 			z = Utils.int16d(data, off); off += 2;
+            tag = Utils.int16d(data, off); off += 2;
 			addz = Utils.int16d(data, off); off += 2;
-			
+
+
 			offx = Utils.int16d(data, off); off += 2;
 			offy = Utils.int16d(data, off); off += 2;
 			
@@ -594,6 +583,7 @@ public class Resource implements Prioritized {
 			off += 2 + tex_name.length();
 			
 			z = Utils.int16d(data, off); off += 2;
+            tag = Utils.int16d(data, off); off += 2;
 			addz = Utils.int16d(data, off); off += 2;
 			
 			offx = Utils.int16d(data, off); off += 2;
@@ -996,6 +986,7 @@ public class Resource implements Prioritized {
 		         }
 		     }
 		    Log.info("res versions success loaded");
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			Main.GlobalError("ERROR: failed load versions list");

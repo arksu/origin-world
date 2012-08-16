@@ -1,18 +1,18 @@
 /*
- *  This file is part of the Origin-World game client.
- *  Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
+ * This file is part of the Origin-World game client.
+ * Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3 of the License.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package a1.gui;
 
@@ -41,7 +41,7 @@ public class GUI_Equip extends GUI_Control {
 				int mx = gui.mouse_pos.x - abs_pos.x;
 				int my = gui.mouse_pos.y - abs_pos.y;
 				NetGame.SEND_gui_click(201, 0, mx, my, parent.id, btn);
-			};
+			}
 		};
 		head.NetRead(pkt);
 		if (head.objid == 0) {head.is_local = true; head.SetSize(65, 32);}
@@ -53,7 +53,7 @@ public class GUI_Equip extends GUI_Control {
 				int mx = gui.mouse_pos.x - abs_pos.x;
 				int my = gui.mouse_pos.y - abs_pos.y;
 				NetGame.SEND_gui_click(202, 0, mx, my, parent.id, btn);
-			};
+			}
 		};
 		body.NetRead(pkt);
 		if (body.objid == 0) {body.is_local = true; body.SetSize(65, 65);}
@@ -65,7 +65,7 @@ public class GUI_Equip extends GUI_Control {
 				int mx = gui.mouse_pos.x - abs_pos.x;
 				int my = gui.mouse_pos.y - abs_pos.y;
 				NetGame.SEND_gui_click(203, 0, mx, my, parent.id, btn);
-			};
+			}
 		};
 		lhand.NetRead(pkt);
 		if (lhand.objid == 0) {lhand.is_local = true; lhand.SetSize(65, 65);}
@@ -76,7 +76,7 @@ public class GUI_Equip extends GUI_Control {
 				int mx = gui.mouse_pos.x - abs_pos.x;
 				int my = gui.mouse_pos.y - abs_pos.y;
 				NetGame.SEND_gui_click(204, 0, mx, my, parent.id, btn);
-			};
+			}
 		};
 		rhand.NetRead(pkt);
 		if (rhand.objid == 0) {rhand.is_local = true; rhand.SetSize(65, 65);}
@@ -87,7 +87,7 @@ public class GUI_Equip extends GUI_Control {
 				int mx = gui.mouse_pos.x - abs_pos.x;
 				int my = gui.mouse_pos.y - abs_pos.y;
 				NetGame.SEND_gui_click(205, 0, mx, my, parent.id, btn);
-			};
+			}
 		};
 		legs.NetRead(pkt);
 		if (legs.objid == 0) {legs.is_local = true; legs.SetSize(65, 65);}
@@ -98,7 +98,7 @@ public class GUI_Equip extends GUI_Control {
 				int mx = gui.mouse_pos.x - abs_pos.x;
 				int my = gui.mouse_pos.y - abs_pos.y;
 				NetGame.SEND_gui_click(206, 0, mx, my, parent.id, btn);
-			};
+			}
 		};
 		foots.NetRead(pkt);
 		if (foots.objid == 0) {foots.is_local = true; foots.SetSize(65, 32);}

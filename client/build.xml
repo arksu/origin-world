@@ -74,7 +74,8 @@
 				<property name="error-checking" value="pedantic" />
 				<keep>
 					<method name="void main(java.lang.String[])" class="a1.Main" />
-					<class classes="public" /> 
+
+                    <class classes="public" />
 				</keep>
 			</shrink>
 

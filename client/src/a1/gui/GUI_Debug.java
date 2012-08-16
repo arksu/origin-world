@@ -1,28 +1,27 @@
 /*
- *  This file is part of the Origin-World game client.
- *  Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
+ * This file is part of the Origin-World game client.
+ * Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3 of the License.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package a1.gui;
 //класс для отладки гуя.
 
-import org.lwjgl.input.Keyboard;
-import org.newdawn.slick.Color;
-
 import a1.Coord;
 import a1.Input;
 import a1.Render2D;
+import org.lwjgl.input.Keyboard;
+import org.newdawn.slick.Color;
 
 public class GUI_Debug {
 	static public boolean active=false;
@@ -53,17 +52,30 @@ public class GUI_Debug {
 			}
 			
 			int d = Input.isCtrlPressed()?1:5;
+
 			Coord dd = Coord.z;
-			if (Input.KeyHit(Keyboard.KEY_LEFT))
+			if (!Input.isShiftPressed() && Input.KeyHit(Keyboard.KEY_LEFT))
 				dd = new Coord(-d, 0);
-			if (Input.KeyHit(Keyboard.KEY_RIGHT))
+			if (!Input.isShiftPressed() && Input.KeyHit(Keyboard.KEY_RIGHT))
 				dd = new Coord(d, 0);
-			if (Input.KeyHit(Keyboard.KEY_UP))
+			if (!Input.isShiftPressed() && Input.KeyHit(Keyboard.KEY_UP))
 				dd = new Coord(0, -d);
-			if (Input.KeyHit(Keyboard.KEY_DOWN))
+			if (!Input.isShiftPressed() && Input.KeyHit(Keyboard.KEY_DOWN))
 				dd = new Coord(0, d);
 			
 			debug_ctrl.SetPos(debug_ctrl.pos.add(dd));
+
+            dd = Coord.z;
+            if (Input.isShiftPressed() && Input.KeyHit(Keyboard.KEY_LEFT))
+                dd = new Coord(-d, 0);
+            if (Input.isShiftPressed() && Input.KeyHit(Keyboard.KEY_RIGHT))
+                dd = new Coord(d, 0);
+            if (Input.isShiftPressed() && Input.KeyHit(Keyboard.KEY_UP))
+                dd = new Coord(0, -d);
+            if (Input.isShiftPressed() && Input.KeyHit(Keyboard.KEY_DOWN))
+                dd = new Coord(0, d);
+
+            debug_ctrl.SetSize(debug_ctrl.size.add(dd));
 		}
 	}
 }

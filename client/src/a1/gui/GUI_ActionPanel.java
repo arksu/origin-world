@@ -1,29 +1,29 @@
 /*
- *  This file is part of the Origin-World game client.
- *  Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
+ * This file is part of the Origin-World game client.
+ * Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3 of the License.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package a1.gui;
 
-import static a1.gui.Skin.StateNormal;
+import a1.ActionsMenu;
+import a1.ActionsMenu.ActionsMenuItem;
+import a1.Config;
+import a1.Input;
 
 import java.util.List;
 
-import a1.ActionsMenu;
-import a1.Input;
-import a1.ActionsMenu.ActionsMenuItem;
-import a1.utils.AppSettings;
+import static a1.gui.Skin.StateNormal;
 
 public class GUI_ActionPanel extends GUI_Control{
 	public GUI_ActionPanel(GUI_Control parent) {
@@ -44,8 +44,10 @@ public class GUI_ActionPanel extends GUI_Control{
 							parent.BeginDragMove();
 							return true;
 						}				
-					} else
+					} else {
 						parent.EndDragMove();
+                        SaveState();
+                    }
 				}
 				return false;
 			}
@@ -166,15 +168,16 @@ public class GUI_ActionPanel extends GUI_Control{
 	
 	// Load position and slots
 	public void LoadState() {
-		int bx = (Integer)AppSettings.getCharacterValue("DEFAULT_PLAYER", readonly_mode_rootLevel + "_position_x", Integer.class);
-		int by = (Integer)AppSettings.getCharacterValue("DEFAULT_PLAYER", readonly_mode_rootLevel + "_position_y", Integer.class);
-		if (bx != 0 && by != 0)	SetPos(bx, by);
+//		int bx = (Integer)AppSettings.getCharacterValue("DEFAULT_PLAYER", readonly_mode_rootLevel + "_position_x", Integer.class);
+//		int by = (Integer)AppSettings.getCharacterValue("DEFAULT_PLAYER", readonly_mode_rootLevel + "_position_y", Integer.class);
+//		if (bx != 0 && by != 0)	SetPos(bx, by);
 	}
 	
 	// Save position and slots
 	public void SaveState() {
-		AppSettings.putCharacterValue("DEFAULT_PLAYER", readonly_mode_rootLevel + "_position_x", pos.x);
-		AppSettings.putCharacterValue("DEFAULT_PLAYER", readonly_mode_rootLevel + "_position_y", pos.y);
+//		AppSettings.putCharacterValue("DEFAULT_PLAYER", readonly_mode_rootLevel + "_position_x", pos.x);
+//		AppSettings.putCharacterValue("DEFAULT_PLAYER", readonly_mode_rootLevel + "_position_y", pos.y);
+        Config.save_options();
 	}
 	
 	// Just render window

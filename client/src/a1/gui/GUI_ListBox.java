@@ -1,18 +1,18 @@
 /*
- *  This file is part of the Origin-World game client.
- *  Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
+ * This file is part of the Origin-World game client.
+ * Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3 of the License.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package a1.gui;
 
@@ -24,6 +24,7 @@ import a1.Render2D;
 public class GUI_ListBox extends GUI_ScrollPage {
 	protected int SelectedItem = -1;
 	public boolean RenderBG = true;	
+    public boolean pressed = false;
 	
 	public GUI_ListBox(GUI_Control parent) {
 		super(parent);
@@ -51,11 +52,11 @@ public class GUI_ListBox extends GUI_ScrollPage {
 			h = GetItemHeight(i);
 			// если запись всяко за границами рисуемой области - пропускаем
 			if ((ay+h >= abs_pos.y+ClientRect.y) && (ay < abs_pos.y+ClientRect.y+wr.h)) {
-					Render2D.PushScissor(new IntCoord(ax, ay, wr.w , h));
-		            DrawItemBg(i, ax, ay, wr.w, h);
-		            DoDrawItem(i, ax, ay, wr.w, h);
+                Render2D.PushScissor(new IntCoord(ax, ay, wr.w , h));
+                DrawItemBg(i, ax, ay, wr.w, h);
+                DoDrawItem(i, ax, ay, wr.w, h);
 
-				Render2D.PopScissor();
+                Render2D.PopScissor();
 			}
 			ay += h;
 		}
@@ -73,7 +74,20 @@ public class GUI_ListBox extends GUI_ScrollPage {
 	
 	public boolean DoMouseBtn(int btn, boolean down) {
 		boolean result = false;
-		if (!MouseInMe()) return result;
+		if (!MouseInMe()) {
+            pressed = false;
+            return result;
+        }
+        
+        if (btn == Input.MB_LEFT) {
+            if (down) {
+                if (MouseInMe()){
+                    pressed = true;
+                }
+            } else {
+                pressed = false;
+            }
+        }
 		
 		IntCoord wr = WorkRect();
 		// координаты текущей записи относительно контрола
@@ -103,7 +117,11 @@ public class GUI_ListBox extends GUI_ScrollPage {
 		
 		return result;
 	}
-	
+
+    public void SetSelected(int index) {
+        SetSelected(index, true);
+    }
+
 	public void SetSelected(int index, boolean value) {
 		if (value) {
 			SelectedItem = index;
@@ -187,6 +205,7 @@ public class GUI_ListBox extends GUI_ScrollPage {
 					return i;
 				}
 			}
+            ay += h;
 		}
 		return result;
 	}

@@ -1,18 +1,18 @@
 /*
- *  This file is part of the Origin-World game client.
- *  Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
+ * This file is part of the Origin-World game client.
+ * Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3 of the License.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package a1.net;
 
@@ -67,4 +67,14 @@ public class NetPacketsID {
 	static final int GAMESERVER_SET_PLAYER_PARAM = 147;
     static final int GAMESERVER_OBJ_TYPE = 148;
     static final int GAMESERVER_BUG_REPORT = 149;
+    static final int GAMESERVER_KNOWLEDGE = 150;
+    static final int GAMESERVER_KNOWLEDGE_INC = 151;
+    static final int GAMESERVER_KNOWLEDGE_DEC = 152;
+    static final int GAMESERVER_SKILL_BUY = 153;
+    static final int GAMESERVER_DIALOG_OPEN = 154;
+    static final int GAMESERVER_DIALOG_CLOSE = 155;
+    static final int GAMESERVER_OBJECT_CLOSE = 156;
+    static final int GAMESERVER_OBJECT_VISUAL_STATE = 157;
+    static final int GAMESERVER_OBJECT_VISUAL_STATE_ACK = 158;
+
 }

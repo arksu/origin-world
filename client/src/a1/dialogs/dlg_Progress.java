@@ -1,31 +1,26 @@
 /*
- *  This file is part of the Origin-World game client.
- *  Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
+ * This file is part of the Origin-World game client.
+ * Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3 of the License.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package a1.dialogs;
 
-import org.newdawn.slick.Color;
-import a1.Log;
-
-import a1.DialogFactory;
-import a1.Lang;
-import a1.Packet;
-import a1.Render2D;
+import a1.*;
 import a1.gui.GUI;
 import a1.gui.GUI_Label;
 import a1.gui.GUI_Progressbar;
+import org.newdawn.slick.Color;
 //import a1.gui.GUI_Texture;
 
 public class dlg_Progress extends Dialog {
@@ -86,7 +81,7 @@ public class dlg_Progress extends Dialog {
 			dlg.progress.SetMin(0);
 			dlg.progress.SetMax(30);
 			dlg.progress.SetValue(val);
-			dlg.progress.SetColor(Color.green);
+			dlg.progress.SetColor(new Color(115,126,12));
 			dlg.txt_label.caption = Lang.getTranslate("generic", "action_progress");
 		}
 	}
@@ -105,7 +100,7 @@ public class dlg_Progress extends Dialog {
 			dlg.progress.SetMin(0);
 			dlg.progress.SetMax(len);
 			dlg.progress.SetValue(time);
-			dlg.progress.SetColor(Color.blue);
+			dlg.progress.SetColor(new Color(12,90,126));
 			dlg.txt_label.caption = Lang.getTranslate("generic", "action_reuse");
 		}
 		

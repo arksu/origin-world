@@ -1,29 +1,32 @@
 /*
- *  This file is part of the Origin-World game client.
- *  Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
+ * This file is part of the Origin-World game client.
+ * Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3 of the License.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package a1;
 
-import java.awt.Color;
+import a1.utils.Utils;
+import com.ericsson.otp.erlang.OtpErlangDecodeException;
+import com.ericsson.otp.erlang.OtpErlangObject;
+import com.ericsson.otp.erlang.OtpInputStream;
+import com.ericsson.otp.erlang.OtpOutputStream;
+
+import java.awt.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.zip.GZIPInputStream;
-
-import a1.utils.*;
-import com.ericsson.otp.erlang.*;
 
 public class Packet {
     public int type;
@@ -36,14 +39,6 @@ public class Packet {
 		this.len = blob.length;
 		this.blob = blob;
     }
-
-//    public Packet(int type, byte[] blob, int offset, int len) {
-//		this.type = type;
-//		this.len = 0;
-//		this.blob = new byte[len];
-//		if (len > 0)
-//			System.arraycopy(blob, offset, this.blob, 0, len);
-//    }
 
     public Packet(int type, int len) {
 		this.type = type;
@@ -98,13 +93,7 @@ public class Packet {
 		if (conn != null) 
 			conn.Send(this);
 	}
-    
-//    public Packet slice(int type, int len) {
-//    	int ooffset = offset;
-//    	offset += len;
-//    	return(new Packet(type, blob, ooffset, len));
-//    }
-//        
+
     // WRITE METHODS -------------------------------------------------------
     
     public void write_bytes(byte[] src, int offset, int len) {
@@ -124,7 +113,6 @@ public class Packet {
 
     public void write_int(int num) {
         byte[] buf = new byte[4];
-    	//Utils.int32e(num, buf, 0);
 
         buf[0] = (byte) (num &0xff);
         buf[1] = (byte) (num >> 8 &0xff);
@@ -163,27 +151,6 @@ public class Packet {
     	write_bytes(buf);
     }
 
-//    public void addcoord(Coord c) {
-//    	addint32(c.x);
-//    	addint32(c.y);
-//    }
-
-//    public void addlist(Object... args) {
-//    	for(Object o : args) {
-//    	    if(o instanceof Integer) {
-//    		adduint8(T_INT);
-//    		addint32(((Integer)o).intValue());
-//    	    } else if(o instanceof String) {
-//    		adduint8(T_STR);
-//    		addstring((String)o);
-//    	    } else if(o instanceof Coord) {
-//    		adduint8(T_COORD);
-//    		addcoord((Coord)o);
-//    	    }
-//    	}
-//    } 
-    
-    
     // READ FUNCTIONS ------------------------------------------------------------
     
     public boolean eof() {
@@ -202,20 +169,7 @@ public class Packet {
     	return(Utils.unsigned_byte(blob[offset++]));
     }
 
-//    public int uint16() {
-//    	offset += 2;
-//    	return(Utils.uint16d(blob, offset - 2));
-//    }
-
     public int read_int() {
-//        offset += 4;
-//    	return(Utils.int32d(blob, offset - 4));
-
-//        int result = blob[offset++] & 0xff;
-//        result |= blob[offset++] << 8 & 0xff;
-//        result |= blob[offset++] << 16 & 0xff;
-//        result |= blob[offset++] << 24 & 0xff;
-//        return result;
         offset +=4;
         return(  Utils.unsigned_byte(blob[offset - 4]) +
                 (Utils.unsigned_byte(blob[offset - 3]) * 256) +
@@ -268,6 +222,15 @@ public class Packet {
 		}
     }
 
+    public void write_erlang_term(OtpErlangObject term) {
+        OtpOutputStream outs = new OtpOutputStream(term);
+        byte [] data = outs.toByteArray();
+        write_int(data.length+1);
+        // its a magic!
+        write_byte((byte) (131 &0xff));
+        write_bytes(data);
+    }
+
     public byte[] read_bytes(int len) {
     	byte[] b = new byte[len];
     	offset += len;
@@ -276,46 +239,27 @@ public class Packet {
     }
     
     public byte[] read_map_data() {
-    	byte[] b = new byte[len-offset];
-    	System.arraycopy(blob, offset, b, 0, len-offset);
-    	//Log.info("recv map data. len="+(len-offset));
+        int dl = read_int();
+    	byte[] b = new byte[dl];
+    	System.arraycopy(blob, offset, b, 0, dl);
     	try {
 			GZIPInputStream gz = new GZIPInputStream(new ByteArrayInputStream(b));
-			byte[] map = new byte[20000];
-			gz.read(map);
+			byte[] map = new byte[MapCache.GRID_SIZE_BYTES];
+            
+			int fl = 0;
+            while (fl < MapCache.GRID_SIZE_BYTES) {
+                fl += gz.read(map, fl, MapCache.GRID_SIZE_BYTES-fl);
+            }
 			return map;
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
 		}
     }
-//    public Coord coord() {
-//    	return(new Coord(int32(), int32()));
-//    }
 
     public Color read_color() {
     	return(new Color(read_unsiged_byte(), read_unsiged_byte(), read_unsiged_byte(), read_unsiged_byte()));
     }
-
-//        public Object[] list() {
-//    	ArrayList<Object> ret = new ArrayList<Object>();
-//    	while(true) {
-//    	    if(off >= blob.length)
-//    		break;
-//    	    int t = uint8();
-//    	    if(t == T_END)
-//    		break;
-//    	    else if(t == T_INT)
-//    		ret.add(int32());
-//    	    else if(t == T_STR)
-//    		ret.add(string());
-//    	    else if(t == T_COORD)
-//    		ret.add(coord());
-//    	    else if(t == T_COLOR)
-//    		ret.add(color());
-//    	}
-//    	return(ret.toArray());
-//        }
 
     public String toString() {
         if (!Config.debug) return "";

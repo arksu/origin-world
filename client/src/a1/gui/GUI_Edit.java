@@ -1,39 +1,30 @@
 /*
- *  This file is part of the Origin-World game client.
- *  Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
+ * This file is part of the Origin-World game client.
+ * Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3 of the License.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package a1.gui;
 
-import static a1.gui.Skin.*;
-import a1.Log;
-
+import a1.*;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
 
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.ClipboardOwner;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.Toolkit;
+import java.awt.*;
+import java.awt.datatransfer.*;
 
-import a1.Coord;
-import a1.Input;
-import a1.IntCoord;
-import a1.Render2D;
+import static a1.gui.Skin.*;
 
 public class GUI_Edit extends GUI_Control implements ClipboardOwner {
 	public String text = "";
@@ -57,6 +48,8 @@ public class GUI_Edit extends GUI_Control implements ClipboardOwner {
 	}
 	
 	public void DoClick() {}
+
+    public void DoChanged() {}
 	
 	protected void UpdateCursor() {		
 		if (!marking) return;
@@ -113,6 +106,7 @@ public class GUI_Edit extends GUI_Control implements ClipboardOwner {
 			DeleteSelection();
 		} else if (pos1 < text.length()) {
 			text = text.substring(0, pos1) + text.substring(pos1+1);
+            DoChanged();
 		}
 	}
 	
@@ -121,6 +115,7 @@ public class GUI_Edit extends GUI_Control implements ClipboardOwner {
 			DeleteSelection();
 		} else if (pos1 > 0) {
 			text = text.substring(0, pos1 - 1) + text.substring(pos1);
+            DoChanged();
 			MoveCursor(0, false);
 		}
 	}
@@ -186,6 +181,7 @@ public class GUI_Edit extends GUI_Control implements ClipboardOwner {
 		if (getSelectionLength() == 0) return;
 		text = text.substring(0, getSelectionStart()) + 
 			text.substring(getSelectionStart() + getSelectionLength());
+        DoChanged();
 		pos1 = getSelectionStart();
 		pos2 = pos1;
 	}
@@ -202,6 +198,7 @@ public class GUI_Edit extends GUI_Control implements ClipboardOwner {
 		DeleteSelection();
 		text = text.substring(0,pos1) + t + 
 			text.substring(pos1);
+        DoChanged();
 		pos1 = CutPos(pos1 + t.length());
 		pos2 = pos1;
 		marking = false;
@@ -217,6 +214,7 @@ public class GUI_Edit extends GUI_Control implements ClipboardOwner {
 		DeleteSelection();
 		text = text.substring(0,pos1) + t + 
 			text.substring(pos1);
+        DoChanged();
 		pos1 = CutPos(pos1 + 1);
 		pos2 = pos1;
 		marking = false;
@@ -227,7 +225,6 @@ public class GUI_Edit extends GUI_Control implements ClipboardOwner {
 		
 		if (btn == Input.MB_LEFT && (!down)) {
 			marking = false;
-			
 		}
 		
 		if (btn == Input.MB_DOUBLE)
@@ -240,7 +237,6 @@ public class GUI_Edit extends GUI_Control implements ClipboardOwner {
 						StartMark();
 					} else {
 						gui.SetFocus(this);
-						//SetCursor(text.length());
 						StartMark();
 					}
 					pressed = true;

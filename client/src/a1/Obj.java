@@ -1,34 +1,31 @@
 /*
- *  This file is part of the Origin-World game client.
- *  Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
+ * This file is part of the Origin-World game client.
+ * Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3 of the License.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package a1;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-
 import a1.gui.GUI;
-import a1.gui.GUI_Map;
 import a1.utils.Resource;
 import a1.utils.Utils;
+
+import java.util.*;
+
 import static a1.MapCache.TILE_SIZE;
+import static a1.gui.GUI_Map.m2s;
+import static a1.gui.GUI_Map.scale;
+import static a1.utils.Resource.draw_items;
 
 public class Obj {
 	public static final int PLAYER_FRAMES = 8;
@@ -52,8 +49,11 @@ public class Obj {
     public int follow_id = 0;
     public Coord follow_offset = Coord.z;
     public int follow_addz = 0;
+    // игнорировать перекрытие
     public boolean ignore_overlap = false;
     public List<Integer> links = new ArrayList<Integer>();
+    // теги для слоев
+    public Set<Integer> tags = new HashSet<Integer>();
 	
 	// hardcode ))
 	protected Coord step_offset = Coord.z; // отступ для отрисовки (нужно для подпрыгивающего чара в нужные кадры анимации)
@@ -104,7 +104,9 @@ public class Obj {
 
 	public void prepare_draw(Coord oc) {
 		ObjParam p = getparam("count");
-		int count = 1;
+		int count;
+        tags.clear();
+        // растения имеют параметр "количество объектов", их рисуем отдельно
 		if (p != null) {
 			if (!Config.count_objs)
 				count = 1;
@@ -117,22 +119,22 @@ public class Obj {
 					Drawable d = getattr(Drawable.class);
 					if (d != null) {
 						objc = count_pos.get(count);
-						add_part(Resource.draw_items.get(d.name), GUI_Map.m2s(objc).add(oc), 0, true); // ignore overlap
+						add_part(draw_items.get(d.name), m2s(objc).add(oc), 0, true); // ignore overlap
 					}
 				}
 			} else {
 				Drawable d = getattr(Drawable.class);
 				if (d != null) {
 					objc = getpos();
-					add_part(Resource.draw_items.get(d.name), GUI_Map.m2s(objc).add(oc), 0, true); // ignore overlap
+					add_part(draw_items.get(d.name), m2s(objc).add(oc), 0, true); // ignore overlap
 				}
 			}
 			// рисуем тень
-			add_part(Resource.draw_items.get("plant_shadow"), GUI_Map.m2s(getpos()).add(oc), 0, true);
+			add_part(draw_items.get("plant_shadow"), m2s(getpos()).add(oc), 0, true);
 	
 		} else {
 			objc = getpos();
-			prepare_draw_coord( GUI_Map.m2s(objc).add(oc));			
+			prepare_draw_coord( m2s(objc).add(oc));
 		}
 
 	}
@@ -151,10 +153,8 @@ public class Obj {
 		// дефолт по умолчанию
 		step_offset = Coord.z;
 		add_draw_part(draw_name, c, addz);
-		
-		// пропарсим эквип и добавим части эквипа
-		// TODO
-		// add_draw_part(draw_name, c.add(step_offset), addz);
+
+		// TODO : пропарсим эквип и добавим части эквипа
 	}
 	
 	private void add_draw_part(String draw_name, Coord c, int addz) {
@@ -170,9 +170,15 @@ public class Obj {
 		if (is_opened)
 			dr_name += "_opened";
 
+
+        step_offset = step_offset.add(get_step_offset());
+
+
+        // игрока рисуем особенным способом
 		if (obj_type.equals("player")) {
 			// ищем нужную часть игрока для отрисовки
-			Resource.ResDraw dr = Resource.draw_items.get(dr_name);
+			Resource.ResDraw dr = draw_items.get(dr_name);
+            boolean in_water = false;
 			if (dr != null) {
 				// ищем анимации
 				for (Resource.ResLayer l : dr.layers) {
@@ -181,16 +187,37 @@ public class Obj {
 						// хардкодом заставим подпрыгивать чара на 1 пиксель 
 						int frame = ((Resource.ResAnim)l).get_current_frame(System.currentTimeMillis() + start_time);
 						if (frame == 0 || frame == 1 || frame == 4 || frame == 5)
-							step_offset = new Coord(0, 1);
+							step_offset = step_offset.add(0, 1);
 						break;
 					}
 				}
-				add_part(dr, c, addz);
+
+
+                // посмотрим в воде ли игрок?
+                byte tile = MapCache.GetTile(objc.div(TILE_SIZE));
+                if (tile == MapCache.TILE_WATER_LOW) {
+                    // ставим игрока ниже
+                    add_part(draw_items.get("player_water_low"), c, addz, true);
+                    in_water = true;
+                } else if (tile == MapCache.TILE_WATER_DEEP) {
+                    in_water = true;
+                }
+
+                // держим что нибудь?
+                if (links.size() > 0) {
+                    // руки вверх
+                    tags.add(2);
+                } else {
+                    tags.add(1);
+                }
+
+                // игрока выводим игнорируя перекрытия. он должен быть видим всегда
+				add_part(dr, c, addz, true);
 			}
 			// тень выводим отдельно чтобы не прыгала вместе с игроком
-			add_part(Resource.draw_items.get("player_shadow"), c, addz, true);
+			if (!in_water) add_part(draw_items.get("player_shadow"), c, addz, true);
 		} else {
-			add_part(Resource.draw_items.get(dr_name), c, addz, ignore_overlap);
+			add_part(draw_items.get(dr_name), c, addz, ignore_overlap);
 		}
 	}
 	
@@ -207,7 +234,7 @@ public class Obj {
 		// check visibility
 		if (
 				(cn.x + dr.width < 0) || (cn.y + dr.height < 0) || 
-				(cn.x > Config.ScreenWidth) || (cn.y > Config.ScreenHeight)
+				(cn.x > Config.getScreenWidth() * (1 / scale)) || (cn.y > Config.getScreenHeight() * (1 / scale))
 			)
 			return;
 
@@ -215,27 +242,58 @@ public class Obj {
 		for (Resource.ResLayer l : dr.layers) {
 			if (l instanceof Resource.ResWeightList) {
 				// если это весовой список
-				for (Resource.ResLayer ll : ((Resource.ResWeightList) l).items.pick(MapCache.randoom(objc)).items) {
-					GUI.map.render_parts.add(new RenderPart(c, cn, ll, this, ll.addz + addz, ignore_overlap));
-				}
-			} else {
-				GUI.map.render_parts.add(new RenderPart(c, cn, l, this, l.addz + addz, ignore_overlap));
+                List<Resource.ResLayer> ls;
+                if (follow_id != 0) {
+                    ls = ((Resource.ResWeightList) l).items.pick_first().items;
+                }
+                else {
+                    ls = ((Resource.ResWeightList) l).items.pick(MapCache.randoom(pos)).items;
+                }
+                for (Resource.ResLayer ll : ls) {
+                    add_part2(c, cn, ll, addz, ignore_overlap);
+                }
+            } else {
+                add_part2(c, cn, l, addz, ignore_overlap);
 			}
 		}
 	}
 	
-	private void add_part(Resource.ResDraw dr, Coord c, int addz) {
-		add_part(dr, c, addz, false);
+	private void add_part2(Coord c, Coord cn, Resource.ResLayer l, int addz, boolean ignore_overlap) {
+        // если мы за кем то закреплены - не рисуем тень. она всегда на 1 слое должна быть
+        if (l.z == 1 && follow_id != 0) return;
+
+        if (l.tag != 0) {
+            if (tags.contains(l.tag))
+                GUI.map.render_parts.add(new RenderPart(c, cn, l, this, l.addz + addz, ignore_overlap));
+        } else
+            GUI.map.render_parts.add(new RenderPart(c, cn, l, this, l.addz + addz, ignore_overlap));
 	}
+
+    // смещение при движении
+    public Coord get_step_offset() {
+        if (obj_type.equals("player")) {
+            byte tile = MapCache.GetTile(objc.div(TILE_SIZE));
+            // посмотрим в воде ли игрок?
+            if (tile == MapCache.TILE_WATER_LOW) {
+                // ставим игрока ниже
+                return new Coord(0, 10);
+            } else if (tile == MapCache.TILE_WATER_DEEP) {
+                return new Coord(0, 20);
+            }
+        } else {
+            if (follow_id != 0) {
+                Obj o = ObjCache.get(follow_id);
+                if (o != null)
+                    return o.get_step_offset();
+            }
+        }
+        return Coord.z;
+    }
 	
 	private boolean is_moving() {
-		
 		LineMove m = getattr(LineMove.class);
-		if (m != null) {
-			return !m.stopped();
-		}
-		return false;
-	}
+        return m != null && !m.stopped();
+    }
 
 	public void update() {
 		for (ObjAttr a : attr.values())
@@ -351,6 +409,9 @@ public class Obj {
 			Class ac : a) {
 				s += ac.getName() + ", ";
 			}
+            for (ObjParam p : params) {
+                s += p.toString() + ", ";
+            }
 			s += "]";
 		}
 		return s;

@@ -1,44 +1,31 @@
 /*
- *  This file is part of the Origin-World game client.
- *  Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
+ * This file is part of the Origin-World game client.
+ * Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3 of the License.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package a1.net;
 
-import static a1.Main.*;
-import static a1.net.NetPacketsID.*;
-
-import a1.Log;
-
-
-import a1.ActionsMenu;
-import a1.Coord;
-import a1.Cursor;
-import a1.FlyText;
-import a1.Main;
-import a1.MapCache;
-import a1.ObjCache;
-import a1.Packet;
-import a1.Player;
-import a1.dialogs.Dialog;
-import a1.dialogs.dlg_Context;
-import a1.dialogs.dlg_Game;
-import a1.dialogs.dlg_Progress;
-import a1.dialogs.dlg_SysMsg;
+import a1.*;
+import a1.dialogs.*;
 import a1.gui.GUI;
 import a1.gui.GUI_Chat;
 import a1.gui.GUI_Control;
+import a1.obj.ObjectVisual;
+import com.ericsson.otp.erlang.OtpErlangObject;
+
+import static a1.Main.GameConnect;
+import static a1.net.NetPacketsID.*;
 
 public class NetGame {
 	static final int PING_TIME = 3000;
@@ -108,7 +95,9 @@ public class NetGame {
 			Player.GlobalTime = pkt.read_int();
 			Log.info("Success logged!");
 
-			Dialog.Show("dlg_game");
+            // грузим все настройки игрока
+            CharSettings.load();
+            Dialog.Show("dlg_game");
 			Main.StartMusic();
 			break;
 		case GAMESERVER_PONG :
@@ -161,7 +150,7 @@ public class NetGame {
 			y = pkt.read_int();
 			// читаем координаты гридов вокруг игрока (список доступных гридов)
 			count = pkt.read_int();
-			Coord[] coords = new Coord[9];
+			Coord[] coords = new Coord[count];
 			for (i = 0; i < count; i++) {
 				coords[i] = new Coord(pkt.read_int(), pkt.read_int());
 			}
@@ -328,6 +317,15 @@ public class NetGame {
 		case GAMESERVER_SET_PLAYER_PARAM :
 			Player.SetParam(pkt);
 			break;
+        case GAMESERVER_KNOWLEDGE :
+            Player.KnowledgeAdd(pkt);
+            break;
+        case GAMESERVER_OBJECT_CLOSE :
+            ObjectVisual.CloseObj(pkt);
+            break;
+        case GAMESERVER_OBJECT_VISUAL_STATE :
+            ObjectVisual.RecvVisualState(pkt);
+            break;
 			
 		default :
 			Log.info("Unhandled packet! id="+pkt.type);
@@ -407,12 +405,51 @@ public class NetGame {
 		p.Send(GameConnect);
 	}
 
+    static public void SEND_dialog_open(String n) {
+        Packet p = new Packet(GAMESERVER_DIALOG_OPEN);
+        p.write_string_ascii(n);
+        p.Send(GameConnect);
+    }
+
+    static public void SEND_dialog_close(String n) {
+        Packet p = new Packet(GAMESERVER_DIALOG_CLOSE);
+        p.write_string_ascii(n);
+        p.Send(GameConnect);
+    }
+
+    static public void SEND_knowledge_inc(String name) {
+        Packet p = new Packet(GAMESERVER_KNOWLEDGE_INC);
+        p.write_string_ascii(name);
+        p.Send(GameConnect);
+    }
+
+    static public void SEND_knowledge_dec(String name) {
+        Packet p = new Packet(GAMESERVER_KNOWLEDGE_DEC);
+        p.write_string_ascii(name);
+        p.Send(GameConnect);
+    }
+
+    static public void SEND_skill_buy(String skill_name, String knw_name) {
+        Packet p = new Packet(GAMESERVER_SKILL_BUY);
+        p.write_string_ascii(skill_name);
+        p.write_string_ascii(knw_name);
+        p.Send(GameConnect);
+    }
+
+
     static public void SEND_bug_report(String subj, String text) {
         Packet p = new Packet(GAMESERVER_BUG_REPORT);
         p.write_string_utf(subj);
         p.write_string_utf(text);
         p.Send(GameConnect);
 
+    }
+
+    static public void SEND_object_visual_ack(int id, OtpErlangObject term) {
+        Packet p = new Packet(GAMESERVER_OBJECT_VISUAL_STATE_ACK);
+        p.write_int(id);
+        p.write_erlang_term(term);
+        p.Send(GameConnect);
     }
 
 	

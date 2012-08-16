@@ -1,35 +1,27 @@
 /*
- *  This file is part of the Origin-World game client.
- *  Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
+ * This file is part of the Origin-World game client.
+ * Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3 of the License.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package a1.dialogs;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import a1.Config;
-import a1.DialogFactory;
-import a1.Lang;
-import a1.Main;
-import a1.Render2D;
+import a1.*;
 import a1.gui.GUI;
 import a1.gui.GUI_Label;
 import a1.utils.Resource;
+
+import java.util.*;
 
 public class dlg_Loading extends Dialog {
 	public GUI_Label lbl;
@@ -69,7 +61,7 @@ public class dlg_Loading extends Dialog {
 		lbl = new GUI_Label(GUI.getInstance().normal);
 		lbl.caption = Lang.getTranslate("generic", "loading") + ".";
 		lbl.SetSize(300, 30);
-		lbl.SetPos(Config.ScreenWidth / 2 - 50,Config.ScreenHeight / 2 - 50);
+		lbl.SetPos(Config.getScreenWidth() / 2 - 50,Config.getScreenHeight() / 2 - 50);
 		lbl.align = Render2D.Align_Default;
 		
 		lbl2 = new GUI_Label(GUI.getInstance().normal);

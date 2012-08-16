@@ -1,18 +1,18 @@
 /*
- *  This file is part of the Origin-World game client.
- *  Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
+ * This file is part of the Origin-World game client.
+ * Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3 of the License.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package a1.dialogs;
 
@@ -52,7 +52,7 @@ public class dlg_Minimap extends Dialog {
 		minimap = new GUI_Minimap(wnd);
 		minimap.SetPos(10, 35);
 		wnd.SetSize(minimap.size.x + 10, minimap.size.y + 30);
-		wnd.SetPos(Config.ScreenWidth - wnd.size.x - 15, Config.ScreenHeight - wnd.size.y - 15);
+		wnd.SetPos(Config.getScreenWidth() - wnd.size.x - 15, Config.getScreenHeight() - wnd.size.y - 15);
 	}
 	
 	public void DoHide() {

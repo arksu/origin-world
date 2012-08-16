@@ -1,33 +1,32 @@
 /*
- *  This file is part of the Origin-World game client.
- *  Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
+ * This file is part of the Origin-World game client.
+ * Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3 of the License.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package a1;
 
-import java.io.File;
-
+import a1.utils.AppSettings;
+import a1.utils.TilesDebug;
+import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.newdawn.slick.openal.SoundStore;
 
-import a1.utils.AppSettings;
-import a1.utils.TilesDebug;
-import a1.Log;
+import java.io.File;
 
 public class Config {
 	// имя конфиг файла в каталоге с клиентом
-	public static final String config_file = "options.xml";
+	public static final String config_file = "options.ini";
 	// адрес логин сервера
 	public static String login_server = "origin-world.com";
     // порт логин сервера
@@ -37,13 +36,20 @@ public class Config {
 	// раземры экрана
 	public static int ScreenWidth;
 	public static int ScreenHeight;
+	// раземры окна
+	public static int WindowWidth;
+	public static int WindowHeight;
 	// позиция окна на рабочем столе
 	public static int WindowPosX;
 	public static int WindowPosY;
 	// желаемое значение фпс
 	public static int FrameFate;
-	// запускать в полноэкранном режиме
-	public static boolean StartFullscreen;
+    // включать ли вертикальную синхронизацию
+    public static boolean VSync;
+    // Снижение фоновой активности окна
+    public static boolean ReduceInBackground;
+    // запускать в полноэкранном режиме
+	public static boolean isFullscreen;
 	// включены ли звуки
 	public static boolean SoundEnabled;
 	// уровень громкости музыки
@@ -78,9 +84,13 @@ public class Config {
 	public static boolean hide_overlapped;
     // постоянно двигаться с зажатой левой кнопкой мыши
     public static boolean move_inst_left_mouse;
+    // зум камеры колесом мышки
+    public static boolean zoom_by_wheel;
+    // зумить прямо под курсор мышки
+    public static boolean zoom_over_mouse;
 
 	public static final int PROTO_VERSION = 2;
-	public static final int CLIENT_VERSION = 59;
+	public static final int CLIENT_VERSION = 62;
 
 	public static final int ICON_SIZE = 32;
 
@@ -158,27 +168,42 @@ public class Config {
 		SoundStore.get().setSoundVolume(val / 100);
 		val = MusicVolume;
 		SoundStore.get().setMusicVolume(val / 100);
+        Display.setVSyncEnabled(VSync);
 	}
+
+    public static int getScreenWidth() {
+        return isFullscreen ? ScreenWidth : WindowWidth;
+    }
+
+    public static int getScreenHeight() {
+        return isFullscreen ? ScreenHeight : WindowHeight;
+    }
 
 	public static void load_options() {
 		AppSettings.load(new File(config_file));
 
-		ScreenWidth = AppSettings.getInt("screen_width", 1024);
-		ScreenHeight = AppSettings.getInt("screen_height", 768);
+		WindowWidth = AppSettings.getInt("window_width", 1024);
+        WindowHeight = AppSettings.getInt("window_height", 768);
+        ScreenWidth = AppSettings.getInt("screen_width", 1024);
+        ScreenHeight = AppSettings.getInt("screen_height", 768);
 		WindowPosX = AppSettings.getInt("window_pos_x", 0);
 		WindowPosY = AppSettings.getInt("window_pos_y", 0);
 		FrameFate = AppSettings.getInt("frame_rate", 60);
+        VSync = AppSettings.getBool("vsync", true);
+        ReduceInBackground = AppSettings.getBool("reduce_bg", true);
 		SoundVolume = AppSettings.getInt("sound_vol", 50);
 		MusicVolume = AppSettings.getInt("music_vol", 50);
 		ScreenWidth_to_save = ScreenWidth;
 		ScreenHeight_to_save = ScreenHeight;
-		StartFullscreen = AppSettings.getBool("start_fullscreen", false);
+		isFullscreen = AppSettings.getBool("start_fullscreen", false);
 		SoundEnabled = AppSettings.getBool("sound_enabled", true);
 		DebugEngine = AppSettings.getBool("debug_engine", false);
 		current_lang = AppSettings.get("language", "");
 		count_objs = AppSettings.getBool("count_objs", true);
 		hide_overlapped = AppSettings.getBool("hide_overlapped", true);
         move_inst_left_mouse= AppSettings.getBool("move_inst_left_mouse", true);
+        zoom_by_wheel= AppSettings.getBool("zoom_by_wheel", true);
+        zoom_over_mouse= AppSettings.getBool("zoom_over_mouse", true);
 		user = AppSettings.get("user", "");
 		pass = AppSettings.get("pass", "");
 
@@ -186,12 +211,16 @@ public class Config {
 	}
 
 	public static void save_options() {
-		AppSettings.put("screen_width", ScreenWidth_to_save);
+        AppSettings.put("window_width", WindowWidth);
+        AppSettings.put("window_height", WindowHeight);
+        AppSettings.put("screen_width", ScreenWidth_to_save);
 		AppSettings.put("screen_height", ScreenHeight_to_save);
 		AppSettings.put("window_pos_x", WindowPosX);
 		AppSettings.put("window_pos_y", WindowPosY);
 		AppSettings.put("frame_rate", FrameFate);
-		AppSettings.put("start_fullscreen",StartFullscreen);
+        AppSettings.put("vsync", VSync);
+        AppSettings.put("reduce_bg", ReduceInBackground);
+		AppSettings.put("start_fullscreen",isFullscreen);
 		AppSettings.put("sound_enabled",SoundEnabled);
 		AppSettings.put("sound_vol", SoundVolume);
 		AppSettings.put("music_vol", MusicVolume);
@@ -200,6 +229,8 @@ public class Config {
 		AppSettings.put("count_objs", count_objs);
 		AppSettings.put("hide_overlapped", hide_overlapped);
         AppSettings.put("move_inst_left_mouse", move_inst_left_mouse);
+        AppSettings.put("zoom_by_wheel", zoom_by_wheel);
+        AppSettings.put("zoom_over_mouse", zoom_over_mouse);
 		if (save_pass) {
 			AppSettings.put("user", user);
 			AppSettings.put("pass", pass);

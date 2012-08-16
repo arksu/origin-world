@@ -1,31 +1,25 @@
 /*
- *  This file is part of the Origin-World game client.
- *  Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
+ * This file is part of the Origin-World game client.
+ * Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3 of the License.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package a1.gui;
 
-import org.lwjgl.input.Keyboard;
-
-import a1.ChatHistory;
-import a1.Input;
-import a1.KinInfo;
-import a1.Obj;
-import a1.ObjCache;
-import a1.Player;
+import a1.*;
 import a1.dialogs.dlg_Game;
 import a1.net.NetGame;
+import org.lwjgl.input.Keyboard;
 
 
 public class GUI_Chat extends GUI_Control {
@@ -43,7 +37,7 @@ public class GUI_Chat extends GUI_Control {
 		edit = new GUI_Edit(this){
 			public void DoEnter() {
 				DoSend();
-			};
+			}
 		};
 		for (int i = 0; i < 3; i++) {
 			chans[i] = new GUI_Memo(this);
@@ -58,13 +52,18 @@ public class GUI_Chat extends GUI_Control {
 	protected void DoSend() {
 		if (edit.text.length() < 1) return;
 		
-		// отправляем на сервер
-		NetGame.SEND_Chat(CHAT_AREA, "", edit.text);
-		// только если это не админ команда 
+		// только если это не системная команда
 		if (!edit.text.startsWith("/")) {
-			// говорим в клиенте
+            // отправляем на сервер
+            NetGame.SEND_Chat(CHAT_AREA, "", edit.text);
+            // говорим в клиенте
 			RECV_ThisSay(current_channel, Player.CharID, "", edit.text);
-		}
+		} else {
+            // если это системная команда и не обработана на клиенте
+            if (!Console.ExecuteCommand(edit.text.substring(1)))
+                // отправляем на сервер
+                NetGame.SEND_Chat(CHAT_AREA, "", edit.text);
+        }
 		// но в любом случае надо добавить в хистори
 		ChatHistory.Add(edit.text);
 		// и очистить поле ввода в чате

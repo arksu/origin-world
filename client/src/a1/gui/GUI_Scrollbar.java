@@ -1,24 +1,26 @@
 /*
- *  This file is part of the Origin-World game client.
- *  Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
+ * This file is part of the Origin-World game client.
+ * Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3 of the License.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package a1.gui;
 
 import a1.Coord;
 import a1.Input;
-import static a1.gui.Skin.*;
+
+import static a1.gui.Skin.StateHighlight;
+import static a1.gui.Skin.StatePressed;
 
 public class GUI_Scrollbar extends GUI_Control {
 	public int Step = 10;
@@ -157,7 +159,6 @@ public class GUI_Scrollbar extends GUI_Control {
 		if ((PagePressed) && (!immediate))
 			return;
 
-		Coord s;
 		if ((Vertical != val) || immediate) {
 			Vertical = val;
 			// вертикально
@@ -176,8 +177,7 @@ public class GUI_Scrollbar extends GUI_Control {
 					}
 				};
 				BtnDec.skin_element = "button_up";
-				s = getSkin().GetElementSize("button_up");
-				BtnDec.SetSize(s);
+				BtnDec.SetSize(getSkin().GetElementSize("button_up"));
 
 				BtnInc = new GUI_Button(this) {
 					public void DoClick() {
@@ -185,8 +185,7 @@ public class GUI_Scrollbar extends GUI_Control {
 					}
 				};
 				BtnInc.skin_element = "button_down";
-				s = getSkin().GetElementSize("button_down");
-				BtnInc.SetSize(s);
+				BtnInc.SetSize(getSkin().GetElementSize("button_down"));
 				skin_element = "vscroll";
 			} else {
 				// горизонтально
@@ -203,8 +202,7 @@ public class GUI_Scrollbar extends GUI_Control {
 					}
 				};
 				BtnDec.skin_element = "button_left";
-				s = getSkin().GetElementSize("button_left");
-				BtnDec.SetSize(s);
+				BtnDec.SetSize(getSkin().GetElementSize("button_left"));
 
 				BtnInc = new GUI_Button(this) {
 					public void DoClick() {
@@ -213,11 +211,9 @@ public class GUI_Scrollbar extends GUI_Control {
 				};
 				BtnInc.skin_element = "button_right";
 				skin_element = "hscroll";
-				s = getSkin().GetElementSize("button_right");
-				BtnInc.SetSize(s);
+				BtnInc.SetSize(getSkin().GetElementSize("button_right"));
 			}
-			s = getSkin().GetElementSize(skin_element);
-			SetSize(s);
+			SetSize(getSkin().GetElementSize(skin_element));
 			UpdateButtonsPos();
 		}
 	}

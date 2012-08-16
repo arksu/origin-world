@@ -1,31 +1,30 @@
 /*
- *  This file is part of the Origin-World game client.
- *  Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
+ * This file is part of the Origin-World game client.
+ * Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3 of the License.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package a1;
 
-
-import java.util.ArrayList;
-
-import org.lwjgl.input.Keyboard;
 
 import a1.dialogs.Dialog;
 import a1.gui.GUI;
 import a1.gui.GUI_Debug;
 import a1.net.NetGame;
 import a1.utils.TilesDebug;
+import org.lwjgl.input.Keyboard;
+
+import java.util.ArrayList;
 
 public class Hotkeys {
 	
@@ -167,15 +166,20 @@ public class Hotkeys {
 			GUI.getInstance().setActive(!GUI.getInstance().getActive());
 		}
 
+        if (Config.debug && Input.KeyHit(Keyboard.KEY_F9)) {
+            GUI.game_gui_render = !GUI.game_gui_render;
+        }
+
+        if (Input.KeyHit(Keyboard.KEY_F6) && Config.dev_tile_mode) {
+            TilesDebug.ParseTilesXML();
+        }
+
 		if (Input.KeyHit(Keyboard.KEY_F4)) {
 			Config.count_objs = !Config.count_objs;
 			Config.save_options();
 		}
 
-		if (Input.KeyHit(Keyboard.KEY_F6) && Config.dev_tile_mode) {
-			TilesDebug.ParseTilesXML();
-		}
-		
+
 		
 		// minimap
 //		if (Input.KeyHit(Keyboard.KEY_M)) { 
@@ -216,4 +220,20 @@ public class Hotkeys {
 	static public boolean SignKey(int key, int modes) {
 		return true;
 	}
+
+    /**
+     * функция валидирует кнопку которая может быть забиндена
+     * @param key код клавиши
+     * @return можно ли навешать клавишу
+     */
+    static public boolean isKeyValid(int key) {
+        return  (key >= Keyboard.KEY_1 && key <= Keyboard.KEY_EQUALS) ||
+                (key >= Keyboard.KEY_Q && key <= Keyboard.KEY_RBRACKET) ||
+                (key >= Keyboard.KEY_A && key <= Keyboard.KEY_GRAVE) ||
+                (key >= Keyboard.KEY_Z && key <= Keyboard.KEY_SLASH) ||
+                (key >= Keyboard.KEY_F1 && key <= Keyboard.KEY_F10) ||
+                (key >= Keyboard.KEY_NUMPAD7 && key <= Keyboard.KEY_F12) ||
+                (key >= Keyboard.KEY_PAUSE && key <= Keyboard.KEY_DELETE) ||
+                (key == Keyboard.KEY_MULTIPLY) || (key == Keyboard.KEY_DIVIDE);
+    }
 }

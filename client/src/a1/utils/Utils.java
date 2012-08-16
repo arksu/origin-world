@@ -1,20 +1,25 @@
 /*
- *  This file is part of the Origin-World game client.
- *  Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
+ * This file is part of the Origin-World game client.
+ * Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3 of the License.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package a1.utils;
+
+import a1.Config;
+import a1.Log;
+import com.ericsson.otp.erlang.*;
+import org.lwjgl.opengl.GL11;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -22,16 +27,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-
-import org.lwjgl.opengl.GL11;
-
-import a1.Config;
-import a1.Log;
-
-import com.ericsson.otp.erlang.OtpErlangAtom;
-import com.ericsson.otp.erlang.OtpErlangLong;
-import com.ericsson.otp.erlang.OtpErlangObject;
-import com.ericsson.otp.erlang.OtpErlangRangeException;
 
 public class Utils {
     public static byte signed_byte(int b) {
@@ -140,8 +135,8 @@ public class Utils {
 	
     public static void MakeScreenshot() {
     	// Set screen size
-		int width = Config.ScreenWidth;
-		int height = Config.ScreenHeight;
+		int width = Config.getScreenWidth();
+		int height = Config.getScreenHeight();
         // allocate space for RBG pixels
         ByteBuffer framebytes = allocBytes(width * height * 3);
         int[] pixels = new int[width * height];
@@ -235,4 +230,18 @@ public class Utils {
         return result;
     }
 
+    public static String getErlangString(OtpErlangObject term) {
+        if (term instanceof OtpErlangString) {
+            return ((OtpErlangString)term).stringValue();
+        }
+        if (term instanceof OtpErlangList) {
+            OtpErlangList list = (OtpErlangList)term;
+            try {
+                return list.stringValue();
+            } catch (OtpErlangException e) {
+                e.printStackTrace();
+            }
+        }
+        return "error";
+    }
 }

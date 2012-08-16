@@ -1,27 +1,27 @@
 /*
- *  This file is part of the Origin-World game client.
- *  Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
+ * This file is part of the Origin-World game client.
+ * Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3 of the License.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package a1;
 
-import static org.lwjgl.opengl.GL11.*;
-
+import a1.gui.GUI_Map;
+import a1.utils.Resource;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.opengl.Texture;
 
-import a1.utils.Resource;
+import static org.lwjgl.opengl.GL11.*;
 
 public class Sprite {
 	private static Color static_color = null;
@@ -123,6 +123,7 @@ public class Sprite {
 	public void draw(Coord sc) {
 		draw(sc.x, sc.y, tw, th, tx, ty, tw, th, Color.white);
 	}
+	
 	public void draw(int x, int y) {
 		draw(x,y,tw, th, tx, ty, tw, th, Color.white);
 	}
@@ -152,8 +153,8 @@ public class Sprite {
 		glTranslatef(x-offx, y-offy, 0);
 		if (static_color != null)
 			col = static_color;
-		else
-			col = Color.white;
+//		else
+//			col = Color.white;
 		glColor4f(col.r, col.g, col.b, col.a);
 		// draw a quad textured to match the sprite
 		glBegin(GL_QUADS);
@@ -176,5 +177,40 @@ public class Sprite {
 		//glTranslatef(-x+offx, -y+offy, 0);
 		glPopMatrix();
 
+	}
+
+	public void draw2(Coord sc) {
+		if (GUI_Map.tile_vboSize < GUI_Map.tile_Offset + 16)
+			return;
+		
+		float texwidth = texture.getTextureWidth();
+		float texheight = texture.getTextureHeight();
+		
+		float newTextureOffsetX = tx / texwidth;
+		float newTextureOffsetY = ty / texheight;
+		float newTextureWidth = tw / texwidth;
+		float newTextureHeight = th / texheight;
+		
+		putVert(sc.x, sc.y);
+		putTex(newTextureOffsetX,newTextureOffsetY);
+		
+		putVert(sc.x, sc.y + th);
+		putTex(newTextureOffsetX, newTextureOffsetY+newTextureHeight);
+		
+		putVert(sc.x + tw, sc.y + th);
+		putTex(newTextureOffsetX + newTextureWidth,	newTextureOffsetY + newTextureHeight);
+		
+		putVert(sc.x + tw, sc.y);
+		putTex(newTextureOffsetX + newTextureWidth, newTextureOffsetY);		
+	}
+
+	private void putTex(float x, float y) {
+		GUI_Map.tile_vboUpdate[GUI_Map.tile_Offset++] = x;
+		GUI_Map.tile_vboUpdate[GUI_Map.tile_Offset++] = y;
+	}
+
+	private void putVert(int x, int y) {	
+		GUI_Map.tile_vboUpdate[GUI_Map.tile_Offset++] = x;
+		GUI_Map.tile_vboUpdate[GUI_Map.tile_Offset++] = y;
 	}
 }

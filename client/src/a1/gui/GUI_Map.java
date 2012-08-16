@@ -1,62 +1,57 @@
 /*
- *  This file is part of the Origin-World game client.
- *  Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
+ * This file is part of the Origin-World game client.
+ * Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3 of the License.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package a1.gui;
 
-import java.nio.ByteBuffer;
-import a1.Log;
-
-import java.nio.IntBuffer;
-import java.util.*;
-
+import a1.*;
+import a1.utils.Resource;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.EXTFramebufferObject;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GLContext;
 import org.newdawn.slick.Color;
 
-import a1.Config;
-import a1.Coord;
-//import a1.Drawable;
-import a1.Drawable;
-import a1.FlyText;
-import a1.Input;
-import a1.KinInfo; 
-import a1.LineMove;
-import a1.MapCache;
-import a1.Obj;
-import a1.ObjCache;
-import a1.ObjSay;
-import a1.Player;
-import a1.Rect;
-import a1.Render2D;
-import a1.RenderPart;
-import a1.Sprite;
-import a1.Tile;
-import static a1.MapCache.TILE_SIZE;
-//import a1.utils.Resource;
-//import a1.utils.ResourceCache;
-import static a1.net.NetGame.*;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.glTexCoord2f;
-import static org.lwjgl.opengl.GL11.glVertex2i;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.util.*;
 
+import static a1.MapCache.TILE_SIZE;
+import static a1.net.NetGame.SEND_map_click;
+import static org.lwjgl.opengl.GL11.*;
 
 public class GUI_Map extends GUI_Control {
+	
+	// 7000 тайлов * 4 вершины * 4 атрибута
+	public static int tile_vboSize = 80000 * 4 * 4;
+	//
+	public static int tileGrid_vboSize = 80000 * 4 * 2;
+	//
+	public static float[] tile_vboUpdate = new float[tile_vboSize];
+	public static float[] tileGrid_vboUpdate = new float[tile_vboSize];
+	public static int tile_Offset = 0;
+	public static int tileGrid_Offset = 0;
+	//
+	public static int tile_drawCount = 0;
+	public static int tileGrid_drawCount = 0;
+	private static int tile_vbo;
+	private static int tileGrid_vbo;
+	
 	///////////////
 	public static boolean render_rects = false;
 	public static boolean render_lightmap = false;
@@ -76,7 +71,7 @@ public class GUI_Map extends GUI_Control {
 	public Camera camera = null;
 	public Coord mc = Coord.z;
 	public Coord player_coord = Coord.z;
-    
+
 	
 	// отрисован ли уже игрок
 	private boolean player_rendered;
@@ -87,6 +82,12 @@ public class GUI_Map extends GUI_Control {
 	
 	private long last_time_mouse_send = 0;
     private boolean mouse_left_pressed = false;
+    private boolean render_tiles = true;
+    private boolean render_objects = true;
+    private boolean gui_map_rendered = true;
+    public static float scale = 1.0f;
+    Coord scaled_size;
+    public static boolean needUpdateView = true;
 
 	static {
 		cameras.put("fixed", FixedCam.class);
@@ -95,13 +96,33 @@ public class GUI_Map extends GUI_Control {
 	public GUI_Map(GUI_Control parent) {
 		super(parent);
 		GUI.map = this;
-		SetSize(Config.ScreenWidth, Config.ScreenHeight);
+		SetSize(Config.getScreenWidth(), Config.getScreenHeight());
+        scale = 1.0f;
+        scaled_size = new Coord(Config.getScreenWidth(), Config.getScreenHeight()).mul(1/scale);
 		set_camera("fixed");
+		initVBO();
+	}
+
+	private void initVBO() {
+		tile_vbo = GL15.glGenBuffers();
+		tileGrid_vbo = GL15.glGenBuffers();
+		
+		FloatBuffer data = BufferUtils.createFloatBuffer(tile_vboSize);	
+		
+		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, tile_vbo);
+		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, data, GL15.GL_DYNAMIC_DRAW);
+
+		data = BufferUtils.createFloatBuffer(tileGrid_vboSize);
+
+		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, tileGrid_vbo);
+		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, data, GL15.GL_DYNAMIC_DRAW);
+
+		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);		
 	}
 
 	// обработчик апдейта
 	public void DoUpdate() {
-		mouse_map_pos = s2m(gui.mouse_pos.add(viewoffset(size, this.mc).inverse()));
+		mouse_map_pos = s2m(gui.mouse_pos.mul(1 / scale).add(viewoffset(scaled_size, this.mc).inverse()));
 		mouse_tile_coord = tilify(mouse_map_pos);
 		
 		FlyText.Update();
@@ -109,6 +130,7 @@ public class GUI_Map extends GUI_Control {
 		Coord my = my_coord();
 		if (!player_coord.equals(my)) {
 			player_coord = my;
+			needUpdateView = true;
 //			if (camera != null) {
 //				camera.reset();
 //			}
@@ -123,22 +145,42 @@ public class GUI_Map extends GUI_Control {
                 ) {
             SendMapClick(Input.MB_LEFT);
         }
-		
-		if (Input.KeyHit(Keyboard.KEY_HOME) && camera != null) {
-			camera.reset();
-		}
-		if (Input.KeyHit(Keyboard.KEY_G) && Input.isCtrlPressed()) {
-			Config.tile_grid = !Config.tile_grid;
-		}
+
+        if (Input.KeyHit(Keyboard.KEY_G) && Input.isCtrlPressed()) {
+            Config.tile_grid = !Config.tile_grid;
+            needUpdateView = true;
+        }
+        if (gui.focused_control == null) {
+            if (Input.KeyHit(Keyboard.KEY_HOME) && !Input.isCtrlPressed() && camera != null) {
+                camera.reset();
+            }
+            if (Input.KeyHit(Keyboard.KEY_HOME) && Input.isCtrlPressed()) {
+                scale = 1.0f;
+                updateScale();
+            }
+
+            if (Config.debug && Input.KeyHit(Keyboard.KEY_T) && Input.isCtrlPressed()) {
+                render_tiles = !render_tiles;
+            }
+
+            if (Config.debug && Input.KeyHit(Keyboard.KEY_Y) && Input.isCtrlPressed()) {
+                render_objects = !render_objects;
+            }
+
+            if (Config.debug && Input.KeyHit(Keyboard.KEY_U) && Input.isCtrlPressed()) {
+                gui_map_rendered = !gui_map_rendered;
+            }
+        }
 		
 		if (camera != null) {
 			if (get_player() != null)
-				camera.setpos(this, get_player(), size);
+				camera.setpos(this, get_player(), scaled_size);
 			camera.update(this);
 		}
 		
 		if (Input.KeyHit(org.newdawn.slick.Input.KEY_F2)) 
 			render_rects = !render_rects;
+
 				
 //		if (Input.KeyHit(org.newdawn.slick.Input.KEY_F4)) 
 //			render_lightmap = !render_lightmap;
@@ -150,20 +192,53 @@ public class GUI_Map extends GUI_Control {
 		//PrepareTiles();
 		// need sort parts in render list
 		Collections.sort(render_parts, RenderPart.part_cmp);
-	}	
+	}
+
+    public boolean DoMouseWheel(boolean isUp, int len) {
+        if (!MouseInMe() || !Config.zoom_by_wheel)
+            return false;
+
+        float olds = scale;
+        scale = scale + (isUp?1:-1)*0.1f*len;
+        if (scale < 0.4f) scale = 0.4f;
+        if (scale > 5.0f) scale = 5.0f;
+        if (camera != null && Config.zoom_over_mouse) camera.scaled(this, olds);
+        updateScale();
+        return true;
+    }
+
+    private void updateScale() {
+        needUpdateView = true;
+        scaled_size = new Coord(Config.getScreenWidth(), Config.getScreenHeight()).mul(1/scale);
+    }
+
+    /* (non-Javadoc)
+	 * @see a1.gui.GUI_Control#DoDestroy()
+	 */
+	@Override
+	public void DoDestroy() {
+		GL15.glDeleteBuffers(tile_vbo);
+		GL15.glDeleteBuffers(tileGrid_vbo);
+		super.DoDestroy();
+	}
 
 	// обработчик рендера
 	public void DoRender() {
+        if (!gui_map_rendered) return;
+
 		if (render_lightmap) CreateLightMap();
 		
 		GL11.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
+		//GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
 		RenderedObjects = 0;
-		DrawTiles();
-		DrawObjects();
+        GL11.glPushMatrix();
+        GL11.glScalef(scale, scale, 1.0f);
+		if (render_tiles) DrawTiles();
+		if (render_objects) DrawObjects();
 		DrawFlyText();
 		
 		if (render_lightmap) RenderLightMap();
+        GL11.glPopMatrix();
 		
 		if (Config.debug) {
 			Render2D.Text("", 10, 200, "mc="+mc.toString());
@@ -175,12 +250,37 @@ public class GUI_Map extends GUI_Control {
 				Render2D.Text("", 10, 260, "mouse_tile_coord="+mouse_tile_coord.toString());
 				Coord tc = mouse_tile_coord.div(TILE_SIZE);
 				Render2D.Text("", 10, 280, "mouse_tile="+tc.toString());
-				Render2D.Text("", 10, 300, "mouse_tile_level="+Integer.toString(Tile.getlevel(tc)));
+				Render2D.Text("", 10, 300, "mouse_tile_type="+Integer.toString(MapCache.GetTile(tc)));
 			}
 			
 			if (player_rect != null)
 				Render2D.Text("", 10, 320, "player_rect="+player_rect.toString());
+            Render2D.Text("", 10, 340, "scale="+String.valueOf(scale));
 		}
+	}
+
+	private void updateVBO() {
+		
+		tile_drawCount = tile_Offset / 4;
+		tileGrid_drawCount = tileGrid_Offset / 2;
+
+		FloatBuffer data = BufferUtils.createFloatBuffer(tile_Offset);
+		data.put(tile_vboUpdate, 0, tile_Offset);
+		data.flip();
+		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, tile_vbo);
+		GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, data);
+
+		data = BufferUtils.createFloatBuffer(tileGrid_Offset);
+		data.put(tileGrid_vboUpdate, 0, tileGrid_Offset);
+		data.flip();
+		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, tileGrid_vbo);
+		GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, data);
+
+		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);	
+
+		// Arrays.fill(tile_vboUpdate, 0);
+		tile_Offset = 0;
+		tileGrid_Offset = 0;
 	}
 
 	// обработчик нажатия кнопок мыши
@@ -190,13 +290,18 @@ public class GUI_Map extends GUI_Control {
 		
 		// обработаем камеру
 		if (camera != null) {
-			if (camera.DoMouseBtn(this, gui.mouse_pos, mc, btn, down)) return true;
-		}
+            if (camera.DoMouseBtn(this, gui.mouse_pos.mul(1 / scale), mc, btn, down)) {
+                needUpdateView = true;
+                return true;
+            }
+        }
 
 		// если и в камеру не попали - шлем клик по карте на сервер
 		if (down) {
-			mouse_map_pos = s2m(gui.mouse_pos.add(viewoffset(size, this.mc).inverse()));
+            mouse_map_pos = s2m(gui.mouse_pos.mul(1 / scale).add(
+                    					viewoffset(scaled_size, this.mc).inverse()));
 			if (mouse_map_pos != null) SendMapClick(btn);
+			needUpdateView = true;
 			return true;
 		}
 		
@@ -227,7 +332,7 @@ public class GUI_Map extends GUI_Control {
 
 		public void update(GUI_Map mv) {
 			if (!last_mouse_pos.equals(mv.gui.mouse_pos)) {
-				last_mouse_pos = new Coord(mv.gui.mouse_pos);
+                last_mouse_pos = new Coord(mv.gui.mouse_pos.mul(1 / scale));
 				mouse_move(mv, last_mouse_pos);
 			}
 		}
@@ -239,6 +344,8 @@ public class GUI_Map extends GUI_Control {
 		//		public static void borderize(GUI_Map mv, Obj player, Coord sz, Coord border) {}
 
 		public void reset() {}
+
+        public void scaled(GUI_Map mv, float old_scale) {}
 	}
 
 	private static abstract class DragCam extends Camera {
@@ -276,6 +383,7 @@ public class GUI_Map extends GUI_Control {
 					mv.mc = mo.add(s2m(off).inverse());
 					moved(mv);
 				}
+				needUpdateView = true;
 			}
 		}
 
@@ -291,7 +399,6 @@ public class GUI_Map extends GUI_Control {
 				setoff = false;
 			}
 			mv.mc = player.getpos().add(off);
-
 		}
 
 		public void moved(GUI_Map mv) {
@@ -299,7 +406,22 @@ public class GUI_Map extends GUI_Control {
 		}
 		public void reset() {
 			off = Coord.z;
+            needUpdateView = true;
 		}
+        public void scaled(GUI_Map mv, float old_scale) {
+            Coord d2 = mv.size.div(2);
+            Coord old = s2m(d2.mul(1/old_scale));
+            Coord ns = s2m(d2.mul(1/scale));
+            Coord ds = ns.sub(old);
+            Coord m1 = s2m(d2);
+            Coord m2 = s2m(mv.gui.mouse_pos);
+            Coord mmc = m1.sub(m2);
+            float dx = (float)mmc.x / (float)m1.x;
+            float dy = (float)mmc.y / (float)m1.y;
+            ds = ds.mul( dx, dy );
+            mv.mc = mv.mc.add(ds);
+            setoff = true;
+        }
 	}
 
 	// CAMERAS END ==============================================================
@@ -313,10 +435,18 @@ public class GUI_Map extends GUI_Control {
 		}
 	}
 	
+	/*	матрица2x2:
+	 * 	|2,	-2|
+	 * 	|1,	 1|
+	 */	
 	public static Coord m2s(Coord c) {
 		return(new Coord((c.x * 2) - (c.y * 2), c.x + c.y));
 	}
 
+	/*  матрица2х2:
+	 * 	|0.25,	0.5|
+	 * 	|-0.25,	0.5|
+	 */
 	public static Coord s2m(Coord c) {
 		return(new Coord((c.x / 4) + (c.y / 2), (c.y / 2) - (c.x / 4)));
 	}
@@ -355,45 +485,6 @@ public class GUI_Map extends GUI_Control {
 		return Coord.z;
 	}
 
-//	public void PrepareTiles() {
-//		int x, y, i;
-//		int stw, sth;
-//		Coord oc, tc, ctc, sc;
-//
-//		RenderedTiles = 0;
-//		Render2D.ChangeColor();
-//		Sprite.setStaticColor();
-//		
-//		// размеры тайла для расчетов
-//		stw = (TILE_SIZE * 4)-2;
-//		sth = TILE_SIZE * 2;
-//		// оффсет центра экрана
-//		oc = viewoffset(size, mc);
-//		// начальный тайл для отрисовки
-//		tc = mc.div(TILE_SIZE);
-//		tc.x += -(size.x / (2 * stw)) - (size.y / (2 * sth)) - 2;
-//		tc.y += (size.x / (2 * stw)) - (size.y / (2 * sth));
-//		
-//		// определяем область видимости тайлов
-//		// создаем массив объектов которые находятся в области видимости
-//		
-//		// проходим построчно по тайлам
-//		// для каждого тайла:
-//		for(y = 0; y < (size.y / sth) + 13; y++) {
-//			for(x = 0; x < (size.x / stw) + 3; x++) {
-//				for(i = 0; i < 2; i++) {
-//					// координаты текущего тайла
-//					ctc = tc.add(new Coord(x + y, -x + y + i));
-//					// экранные координаты тайла
-//					sc = m2s(ctc.mul(TILE_SIZE)).add(oc);
-//					sc.x -= TILE_SIZE * 2;
-//					
-//					render_parts.add(new RenderPart(ctc, oc));
-//				}
-//			}
-//		}
-//	}
-	
 	public void DrawTiles() {
 		int x, y, i;
 		int stw, sth;
@@ -402,55 +493,83 @@ public class GUI_Map extends GUI_Control {
 		RenderedTiles = 0;
 		Render2D.ChangeColor();
 		Sprite.setStaticColor();
-		
+
 		// размеры тайла для расчетов
-		stw = (TILE_SIZE * 4)-2;
+		stw = (TILE_SIZE * 4) - 2;
 		sth = TILE_SIZE * 2;
 		// оффсет центра экрана
-		oc = viewoffset(size, mc);
+        Coord sz = scaled_size;
+		oc = viewoffset(sz, mc);
 		// начальный тайл для отрисовки
 		tc = mc.div(TILE_SIZE);
-		tc.x += -(size.x / (2 * stw)) - (size.y / (2 * sth)) - 2;
-		tc.y += (size.x / (2 * stw)) - (size.y / (2 * sth));
-		
-		// определяем область видимости тайлов
-		// создаем массив объектов которые находятся в области видимости
-		
-		// проходим построчно по тайлам
-		// для каждого тайла:
-		for(y = 0; y < (size.y / sth) + 13; y++) {
-			for(x = 0; x < (size.x / stw) + 3; x++) {
-				for(i = 0; i < 2; i++) {
-					// координаты текущего тайла
-					ctc = tc.add(new Coord(x + y, -x + y + i));
-					// экранные координаты тайла
-					sc = m2s(ctc.mul(TILE_SIZE)).add(oc);
-					sc.x -= TILE_SIZE * 2;
-					// выводим тайл
-					// выводим объекты на этом тайле
-					drawtile(ctc, sc);
-				}
-			}
-		}
-		
-		// если надо выводим сетку тайлов
-		if (Config.tile_grid) {
-			Render2D.Disable2D();
-			for (y = 0; y < (size.y / sth) + 2; y++) {
-				for (x = 0; x < (size.x / stw) + 3; x++) {
+		tc.x += -(sz.x / (2 * stw)) - (sz.y / (2 * sth)) - 2;
+		tc.y += (sz.x / (2 * stw)) - (sz.y / (2 * sth));
+
+		if (needUpdateView) {
+
+			needUpdateView = false;
+
+			for (y = 0; y < (sz.y / sth) + 13; y++) {
+				for (x = 0; x < (sz.x / stw) + 3; x++) {
 					for (i = 0; i < 2; i++) {
-						ctc = tc.add(new Coord(x + y, -x + y + i));
+						// координаты текущего тайла
+						ctc = tc.add(new Coord(x + y, y - x + i));
+						// экранные координаты тайла
 						sc = m2s(ctc.mul(TILE_SIZE)).add(oc);
-						drawtile_grid(ctc, sc);
+						sc.x -= TILE_SIZE * 2;
+						// выводим тайл
+						// выводим объекты на этом тайле
+						drawtile(ctc, sc);
 					}
 				}
 			}
-			Render2D.Enable2D();
+
+			// если надо выводим сетку тайлов
+			if (Config.tile_grid) {
+				for (y = 0; y < (sz.y / sth) + 2; y++) {
+					for (x = 0; x < (sz.x / stw) + 3; x++) {
+						for (i = 0; i < 2; i++) {
+							ctc = tc.add(new Coord(x + y, -x + y + i));
+							sc = m2s(ctc.mul(TILE_SIZE)).add(oc);
+							drawtile_grid(sc);
+						}
+					}
+				}
+			}
+
+			//
+			updateVBO();
 		}
+
+		Color.white.bind();
+		GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
+		GL11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+
+		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, tile_vbo);
+		GL11.glVertexPointer(2, GL11.GL_FLOAT, 16, 0L);
+		GL11.glTexCoordPointer(2, GL11.GL_FLOAT, 16, 8L);
+
+		Resource.textures.get("tiles").bind();
+
+		GL11.glDrawArrays(GL11.GL_QUADS, 0, tile_drawCount);
+
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
+		GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+
+		if (Config.tile_grid) {
+			GL11.glColor4f(0.0f, 0.0f, 0.0f, 0.4f);
+			GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, tileGrid_vbo);
+			GL11.glVertexPointer(2, GL11.GL_FLOAT, 0, 0L);
+			GL11.glDrawArrays(GL11.GL_LINES, 0, tileGrid_drawCount);
+		}
+
+		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+		GL11.glDisableClientState(GL11.GL_VERTEX_ARRAY);
+
 	}
 	
 	public void PrepareRenderParts() {
-		Coord oc = viewoffset(size, mc);
+		Coord oc = viewoffset(scaled_size, mc);
 		render_parts.clear();
         try {
             synchronized (ObjCache.objs) {
@@ -472,7 +591,7 @@ public class GUI_Map extends GUI_Control {
 	
 	// влезает ли объект на экран.
 	public boolean CheckDrawCoord(Coord dc) {
-		return !(dc.x < -100 || dc.y < -100 || dc.x > Config.ScreenWidth+100 || dc.y > Config.ScreenHeight + 100);
+		return !(dc.x < -100 || dc.y < -100 || dc.x > Config.getScreenWidth()+100 || dc.y > Config.getScreenHeight() + 100);
 	}
 	
 	public Color get_render_part_color(RenderPart p) {
@@ -483,7 +602,7 @@ public class GUI_Map extends GUI_Control {
 			else
 				// подсвечиваем зеленым объект под мышкой
 				if (p.owner == mouse_in_object) 
-					return new Color(0,1.0f,0,1.0f); 
+					return new Color(201,236,10,255);
 				else
 					// для всех остальных выводим как есть
 					if (p.owner.shp > 0) {
@@ -540,7 +659,7 @@ public class GUI_Map extends GUI_Control {
 		        for(int u = render_parts.size() - 1; u>=0; u--)
 		        {
 		            RenderPart p = render_parts.get(u);
-		            if (p.owner != place_obj && p.check_hit(gui.mouse_pos)) {
+                    if (p.owner != place_obj && p.check_hit(gui.mouse_pos.mul(1 / scale))) {
 		        		mouse_in_object = p.owner;
 		        		break;
 		        	}
@@ -550,7 +669,7 @@ public class GUI_Map extends GUI_Control {
 			        for(int u = 0; u < render_parts.size(); u++)
 			        {
 			            RenderPart p = render_parts.get(u);
-			            if (p.is_overlapped && p.owner != place_obj && p.check_hit(gui.mouse_pos)) {
+			            if (p.is_overlapped && p.owner != place_obj && p.check_hit(gui.mouse_pos.mul(1 / scale))) {
 			        		mouse_in_object = p.owner;
 			        		break;
 			        	}
@@ -561,10 +680,10 @@ public class GUI_Map extends GUI_Control {
 		}
 		Sprite.setStaticColor();
 		 
-		Coord oc = viewoffset(size, mc);
+		Coord oc = viewoffset(scaled_size, mc);
 		// выводим атрибуты объектов
 		for (Obj o : ObjCache.objs.values()) {
-			Coord dc = m2s(o.getpos()).add(oc);
+            Coord dc = m2s(o.getpos()).add(oc).mul(scale);
 			if (!CheckDrawCoord(dc)) continue;
 			///////////////
 			if (render_rects) {
@@ -577,8 +696,9 @@ public class GUI_Map extends GUI_Control {
 			// ник
 			String nick = "";
 			KinInfo kin = o.getattr(KinInfo.class);
-			if (kin != null)
+			if (kin != null) {
 				nick =  kin.name;
+            }
 		
 			///////////
 			if (Config.debug) {
@@ -593,8 +713,12 @@ public class GUI_Map extends GUI_Control {
 					nick += " move";
 				}
 			}
-			if (kin != null)
-				Render2D.Text("default", dc.x, dc.y-68,0,0, Render2D.Align_Center, nick, Color.white);
+			if (kin != null) {
+                GL11.glPushMatrix();
+                GL11.glLoadIdentity();
+				Render2D.Text("default", dc.x, dc.y-10-Math.round(38*(scale)),0,0, Render2D.Align_Center, nick, Color.white);
+                GL11.glPopMatrix();
+            }
 			//----------------------------------------------------------------
 			
 			///////////////
@@ -617,12 +741,15 @@ public class GUI_Map extends GUI_Control {
 					w1 = left_w - w2;	
 				}
 				int bx = dc.x - w1 - (w2/2);
-				int by = dc.y - bh - 69;
+				int by = dc.y -bh - 15 - Math.round(38*scale);
+                GL11.glPushMatrix();
+                GL11.glLoadIdentity();
 				getSkin().Draw("baloon_left", bx, by, w1, bh);
 				getSkin().Draw("baloon_center", bx+w1, by, w2, bh);
 				getSkin().Draw("baloon_right", bx+w1+w2, by, w3, bh);
 				
 				Render2D.Text("default", bx, by,w,27, Render2D.Align_Center, m, Color.white);
+                GL11.glPopMatrix();
 			}
 			
 			// выводим эффекты объекта
@@ -632,12 +759,15 @@ public class GUI_Map extends GUI_Control {
 	
 	public void DrawFlyText() {
 		Sprite.setStaticColor();		
-		Coord oc = viewoffset(size, mc);
+		Coord oc = viewoffset(scaled_size, mc);
 
 		for (FlyText.FlyTextItem i : FlyText.items) {
-			Coord dc = m2s(i.getpos()).add(oc);
+            Coord dc = m2s(i.getpos()).add(oc).mul(scale);
 			if (CheckDrawCoord(dc)) {
+                GL11.glPushMatrix();
+                GL11.glLoadIdentity();
 				i.Render(dc);
+                GL11.glPopMatrix();
 			}
 		}
 	}
@@ -645,7 +775,7 @@ public class GUI_Map extends GUI_Control {
 	public void drawtile(Coord tc, Coord sc) {	
 		Sprite s = MapCache.getground(tc);
 		if (s != null) { 
-			s.draw(sc); 
+			s.draw2(sc); 
 			RenderedTiles++;
 		}
 		
@@ -653,7 +783,7 @@ public class GUI_Map extends GUI_Control {
 		if (ss != null)
 		for (Sprite s1 : ss) {
 			if (s1 != null) {
-				s1.draw(sc);
+				s1.draw2(sc);
 				RenderedTiles++;
 			}
 		}
@@ -830,16 +960,24 @@ public class GUI_Map extends GUI_Control {
 //		}
 //	}
 	
-	public void drawtile_grid(Coord tc, Coord sc) {
-        Coord c1 = sc;
+	public void drawtile_grid(Coord sc) {
+        if (tileGrid_vboSize < tileGrid_Offset + 16)
+            return;
         Coord c2 = sc.add(m2s(new Coord(0, TILE_SIZE)));
-        Coord c4 = sc.add(m2s(new Coord(TILE_SIZE, 0)));
+		Coord c4 = sc.add(m2s(new Coord(TILE_SIZE, 0)));
         
-        Render2D.ChangeColor(new Color(0.2f,0.2f,0.2f,1.0f));
-        Render2D.Line(c2, c1, 1);
-        Render2D.Line(c1.add(1, 0), c4.add(1, 0), 1);
+		putLine(c2, sc);
+		putLine(sc.add(1, 0), c4.add(1, 0));
 	}
 	
+	private void putLine(Coord v1, Coord v2) {
+		tileGrid_vboUpdate[tileGrid_Offset++] = v1.x;
+		tileGrid_vboUpdate[tileGrid_Offset++] = v1.y;
+
+		tileGrid_vboUpdate[tileGrid_Offset++] = v2.x;
+		tileGrid_vboUpdate[tileGrid_Offset++] = v2.y;
+	}
+
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 	/* * * * * * * * * * * * * * * * * * *   Затемнение    * * * * * * * * * * * * * * * * * */
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -847,7 +985,7 @@ public class GUI_Map extends GUI_Control {
 //	private Sprite current_light_layer = null;
 	
 //	private void ChangeCurrenLightColor(java.awt.Color light) {
-//		base_light_tex = new BufferedImage(Config.ScreenWidth, Config.ScreenHeight, BufferedImage.TYPE_INT_ARGB);
+//		base_light_tex = new BufferedImage(Config.getScreenWidth(), Config.getScreenHeight(), BufferedImage.TYPE_INT_ARGB);
 //		Graphics g = base_light_tex.createGraphics();
 //		g.setColor(light);
 //		g.clearRect(0, 0, base_light_tex.getWidth(), base_light_tex.getWidth());
@@ -897,7 +1035,7 @@ public class GUI_Map extends GUI_Control {
 	int myFBOId;
 	public void CreateLightMap() {
 		
-		//Coord screen_size = new Coord(Config.ScreenWidth, Config.ScreenHeight);
+		//Coord screen_size = new Coord(Config.getScreenWidth(), Config.getScreenHeight());
 		//Coord screen_coord = new Coord(GUI.map.mc).sub(screen_size.div(2));
 		List<Coord> lst = new ArrayList<Coord>();
 		
@@ -1034,4 +1172,11 @@ public class GUI_Map extends GUI_Control {
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+
+    public void DoResolutionChanged() {
+        scaled_size = new Coord(Config.getScreenWidth(), Config.getScreenHeight()).mul(1/scale);
+        SetSize(Config.getScreenWidth(), Config.getScreenHeight());
+        needUpdateView = true;
+    }
 }

@@ -1,24 +1,25 @@
 /*
- *  This file is part of the Origin-World game client.
- *  Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
+ * This file is part of the Origin-World game client.
+ * Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3 of the License.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package a1;
 
-import org.newdawn.slick.Color;
-
+import a1.gui.GUI;
 import a1.utils.FlyParam;
+import org.lwjgl.opengl.GL11;
+import org.newdawn.slick.Color;
 
 public class ObjExp extends ObjEffect {
 	public int combat = 0;
@@ -51,7 +52,9 @@ public class ObjExp extends ObjEffect {
 		String s;
 		int tw = Render2D.GetTextWidth("", ss);
 		int x = dc.x-tw/2 - 7;
-		int y = (int) (dc.y-FlyParam.GetY(t)-85);
+		int y = (int) (dc.y-(FlyParam.GetY(t)+35) - 38*GUI.map.scale);
+		GL11.glPushMatrix();
+		GL11.glLoadIdentity();
 		s = "+"; Render2D.Text("default", x, y,  
 				s, new Color(255, 255, 255, a)); x+=Render2D.GetTextWidth("", s)+2;
 		s = s1; Render2D.Text("default", x, y,  
@@ -64,5 +67,6 @@ public class ObjExp extends ObjEffect {
 				s, new Color(255, 255, 255, a)); x+=Render2D.GetTextWidth("", s)+2;
 		s = s3; Render2D.Text("default", x, y,  
 				s, new Color(40, 255, 40, a));
+		GL11.glPopMatrix();
 	}
 }

@@ -1,33 +1,28 @@
 /*
- *  This file is part of the Origin-World game client.
- *  Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
+ * This file is part of the Origin-World game client.
+ * Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3 of the License.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package a1.gui;
 
 
-import java.util.Map;
-import java.util.TreeMap;
-
+import a1.*;
+import a1.gui.utils.DragInfo;
 import org.newdawn.slick.Color;
 
-import a1.Config;
-import a1.Coord;
-import a1.Input;
-import a1.Main;
-import a1.Render2D;
-import a1.gui.utils.DragInfo;
+import java.util.Map;
+import java.util.TreeMap;
 
 
 public class GUI {
@@ -35,6 +30,7 @@ public class GUI {
 	
 	// game features
 	public static GUI_Map map;
+    public static boolean game_gui_render = true;
 	
 	// core
 	public GUI_Control root;
@@ -97,7 +93,7 @@ public class GUI {
 	
 	public GUI() {
 		root = new GUI_Control(this);
-		root.SetSize(Config.ScreenWidth, Config.ScreenHeight);
+		root.SetSize(Config.getScreenWidth(), Config.getScreenHeight());
 		custom = new GUI_Control(root);
 		normal = new GUI_Control(root);
 		modal = new GUI_Control(root);
@@ -122,6 +118,7 @@ public class GUI {
 		UpdateMousePos();
 		if (!GUI_Debug.active) UpdateMouseButtons();
 		UpdateMouseWheel();
+        UpdateDragState();
 		
 		root.Update();
 	}
@@ -150,20 +147,21 @@ public class GUI {
 			w = sz.x;
 			h = sz.y;
 		}
+        if (w == 0 || h == 0) return;
 		
 		int x = mouse_pos.x;
 		int y = mouse_pos.y;
 		
 		// ищем куда вывести хинт
-		if (x + HINT_OFFSET+w > Config.ScreenWidth) x = Config.ScreenWidth - w; else x += HINT_OFFSET;
-		if (y + HINT_OFFSET+h > Config.ScreenHeight) y -= (h+5); else y += HINT_OFFSET;
+		if (x + HINT_OFFSET+w > Config.getScreenWidth()) x = Config.getScreenWidth() - w; else x += HINT_OFFSET;
+		if (y + HINT_OFFSET+h > Config.getScreenHeight()) y -= (h+5); else y += HINT_OFFSET;
 		
 		// выводим хинт
 		if (mouse_in_control.need_hint_bg) Main.skin.Draw("hint", x, y, w, h);
 		if (mouse_in_control.is_simple_hint) {
 			Render2D.Text(hint_font, x, y, w, h, Render2D.Align_Center, text, Color.white);
 		} else {
-			mouse_in_control.RenderHint(x, y);
+			mouse_in_control.RenderHint(x, y, w, h);
 		}
 	}
 	
@@ -387,8 +385,12 @@ public class GUI {
 				}
 				drag_info.drag_control.DoUpdateDrag(drag_info);
 				return;
-			}
-		}
+			} else {
+                drag_info.state = DragInfo.DRAG_STATE_NONE;
+            }
+		} else {
+            drag_info.state = DragInfo.DRAG_STATE_NONE;
+        }
 		EndDrag(true);
 	}
 	
@@ -401,11 +403,11 @@ public class GUI {
 	}
 	
 	public void ResolutionChanged() {
-		root.SetSize(Config.ScreenWidth, Config.ScreenHeight);
-		normal.SetSize(Config.ScreenWidth, Config.ScreenHeight);
-		popup.SetSize(Config.ScreenWidth, Config.ScreenHeight);
-		modal.SetSize(Config.ScreenWidth, Config.ScreenHeight);
-		custom.SetSize(Config.ScreenWidth, Config.ScreenHeight);
+		root.SetSize(Config.getScreenWidth(), Config.getScreenHeight());
+		normal.SetSize(Config.getScreenWidth(), Config.getScreenHeight());
+		popup.SetSize(Config.getScreenWidth(), Config.getScreenHeight());
+		modal.SetSize(Config.getScreenWidth(), Config.getScreenHeight());
+		custom.SetSize(Config.getScreenWidth(), Config.getScreenHeight());
 	}
 	
 }

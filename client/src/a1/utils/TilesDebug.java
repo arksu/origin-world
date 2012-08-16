@@ -1,30 +1,29 @@
 /*
- *  This file is part of the Origin-World game client.
- *  Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
+ * This file is part of the Origin-World game client.
+ * Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3 of the License.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package a1.utils;
 
 // класс для отладки тайлов. отслеживает изменения хмл конфига тайлов. и перегружает все тайлы из него.
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
+import a1.Config;
+import a1.Log;
+import a1.Main;
+import a1.MapCache;
+import a1.utils.Resource.ResTile;
+import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.w3c.dom.Document;
@@ -32,11 +31,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import a1.Config;
-import a1.Log;
-import a1.Main;
-import a1.MapCache;
-import a1.utils.Resource.ResTile;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 
 public class TilesDebug {
 	public static final int UPDATE_TIME = 1000;
@@ -103,9 +102,9 @@ public class TilesDebug {
 					// если читаем данные из внешнего источника
 					if (is_ext) {
 						// перечитаем текстуру если надо
-						File tf = new File("tiles/"+texture_name+".png");
+						File tf = new File(texture_name+".png");
 						InputStream fin = new FileInputStream(tf);
-						Texture tex = TextureLoader.getTexture("PNG", fin);
+						Texture tex = TextureLoader.getTexture("PNG", fin, GL11.GL_NEAREST);
 						Resource.textures.put(texture_name, tex);
 					}
 					

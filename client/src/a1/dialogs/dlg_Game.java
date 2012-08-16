@@ -1,53 +1,36 @@
 /*
- *  This file is part of the Origin-World game client.
- *  Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
+ * This file is part of the Origin-World game client.
+ * Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3 of the License.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package a1.dialogs;
+
+import a1.*;
+import a1.gui.*;
+import a1.net.NetGame;
+import a1.net.NetLogin;
+import org.lwjgl.input.Keyboard;
+import org.newdawn.slick.Color;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import a1.*;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.Display;
-import org.newdawn.slick.Color;
-
-
-import a1.gui.GUI;
-import a1.gui.GUI_ActionPanel;
-import a1.gui.GUI_BuffPanel;
-import a1.gui.GUI_Button;
-import a1.gui.GUI_Chat;
-import a1.gui.GUI_Label;
-import a1.gui.GUI_Map;
-import a1.gui.GUI_Progressbar;
-import a1.gui.GUI_RunModesPanel;
-import a1.gui.GUI_Target;
-import a1.gui.GUI_Time;
-import a1.gui.GUI_Toolbar;
-import a1.gui.GUI_Window;
-import a1.net.NetGame;
-import a1.net.NetLogin;
-
 public class dlg_Game extends Dialog {
 	public GUI_Map map;
-	public GUI_Button btn_logout, btn_options, btn_stats, btn_equip, btn_inventory, btn_bug_report;
+	public GUI_Button btn_logout, btn_options, btn_stats, btn_equip, btn_inventory, btn_bug_report, btn_bars;
 	public GUI_Chat chat;
 	public GUI_ActionPanel actions_panel;
-	public GUI_Toolbar toolbar;
-	//public GUI_ActionBar action_bar;
 	public GUI_Time time;
 	public GUI_BuffPanel buff_panel;
 	public GUI_Target target = null;
@@ -126,14 +109,21 @@ public class dlg_Game extends Dialog {
         btn_bug_report.caption = Lang.getTranslate("generic", "bug_report");
         btn_bug_report.SetSize(BTN_WIDTH, BTN_HEIGHT);
 
+        //---------------------------------------------------------------------------
+        btn_bars = new GUI_Button(GUI.getInstance().normal) {
+            public void DoClick() {
+                Dialog.Show("dlg_hotbars");
+            }
+        };
+        btn_bars.caption = Lang.getTranslate("generic", "hotbars");
+        btn_bars.SetSize(BTN_WIDTH, BTN_HEIGHT);
+
 		chat = new GUI_Chat(GUI.getInstance().normal);
 		chat.SetSize(300, 200);
 		//Dialog.Show("dlg_minimap");
-		
-		toolbar = new GUI_Toolbar(GUI.getInstance().normal, "toolbar_1", new Coord(Config.ScreenHeight - 100, 200));
 
 		actions_panel = new GUI_ActionPanel(GUI.getInstance().normal, "root", 5, 5);
-		actions_panel.SetPos(Config.ScreenWidth - actions_panel.Width(),Config.ScreenHeight - actions_panel.Height());
+		actions_panel.SetPos(Config.getScreenWidth() - actions_panel.Width(),Config.getScreenHeight() - actions_panel.Height());
 		actions_panel.LoadState();
 		
 		
@@ -150,7 +140,7 @@ public class dlg_Game extends Dialog {
 		hp_bar.SetSize(150, 20);
 		hp_bar.SetMax(100);
 		hp_bar.SetMin(0);
-		hp_bar.SetColor(Color.red);
+		hp_bar.SetColor(new Color(189,49,26, 200));
 		
 		hp_lbl = new GUI_Label(hp_bar);
 		hp_lbl.SetPos(5, 0);
@@ -161,7 +151,7 @@ public class dlg_Game extends Dialog {
 		stamina_bar.SetSize(150, 20);
 		stamina_bar.SetMax(100);
 		stamina_bar.SetMin(0);
-		stamina_bar.SetColor(Color.blue);
+		stamina_bar.SetColor(new Color(72,115,207, 200));
 		
 		stamina_lbl = new GUI_Label(stamina_bar);
 		stamina_lbl.SetPos(5, 0);
@@ -174,14 +164,15 @@ public class dlg_Game extends Dialog {
 	}
 	
 	public void DoResolutionChanged() {
-		btn_logout.SetPos(Config.ScreenWidth-BTN_WIDTH, 0);
-		btn_options.SetPos(Config.ScreenWidth-BTN_WIDTH, btn_logout.size.y);
-		btn_stats.SetPos(Config.ScreenWidth-BTN_WIDTH, btn_options.pos.y+btn_options.size.y);
-		btn_equip.SetPos(Config.ScreenWidth-BTN_WIDTH, btn_stats.pos.y+btn_stats.size.y);
-        btn_inventory.SetPos(Config.ScreenWidth-BTN_WIDTH, btn_equip.pos.y+btn_equip.size.y);
-        btn_bug_report.SetPos(Config.ScreenWidth-BTN_WIDTH, btn_inventory.pos.y+btn_inventory.size.y);
-		chat.SetPos(20,Config.ScreenHeight - 220);
-		map.SetSize(Display.getWidth(), Display.getHeight());
+		btn_logout.SetPos(Config.getScreenWidth()-BTN_WIDTH, 0);
+		btn_options.SetPos(Config.getScreenWidth()-BTN_WIDTH, btn_logout.size.y);
+		btn_stats.SetPos(Config.getScreenWidth()-BTN_WIDTH, btn_options.pos.y+btn_options.size.y);
+		btn_equip.SetPos(Config.getScreenWidth()-BTN_WIDTH, btn_stats.pos.y+btn_stats.size.y);
+        btn_inventory.SetPos(Config.getScreenWidth()-BTN_WIDTH, btn_equip.pos.y+btn_equip.size.y);
+        btn_bug_report.SetPos(Config.getScreenWidth()-BTN_WIDTH, btn_inventory.pos.y+btn_inventory.size.y);
+        btn_bars.SetPos(Config.getScreenWidth()-BTN_WIDTH, btn_bug_report.pos.y+btn_bug_report.size.y);
+		chat.SetPos(20,Config.getScreenHeight() - 220);
+        map.DoResolutionChanged();
 	}
 
 	public void DoHide() {
@@ -206,12 +197,12 @@ public class dlg_Game extends Dialog {
 
         btn_bug_report.Unlink();
         btn_bug_report = null;
+
+        btn_bars.Unlink();
+        btn_bars = null;
 		
 		chat.Unlink();
 		chat = null;
-		
-		toolbar.Unlink();
-		toolbar = null;
 		
 		actions_panel.Unlink();
 		actions_panel = null;
@@ -244,6 +235,8 @@ public class dlg_Game extends Dialog {
 		
 		runs_panel.Unlink();
 		runs_panel = null;
+
+        Hotbar.ClearAll();
 	}
 	
 	public void DoUpdate() {

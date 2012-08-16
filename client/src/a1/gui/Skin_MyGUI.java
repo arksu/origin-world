@@ -1,18 +1,18 @@
 /*
- *  This file is part of the Origin-World game client.
- *  Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
+ * This file is part of the Origin-World game client.
+ * Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3 of the License.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package a1.gui;
 
@@ -290,42 +290,7 @@ public class Skin_MyGUI extends Skin {
 	el = new SkinElement(this, "element_button_right", "core_skin", 12, 32, new IntCoord(0, 0, 0, 0));
 		w1 = 12; h1 = 32; x = 198; y = 180;
 		AddStatesCenter(el, h1, w1, x, y);
-	// OBJECTS
 
-		
-	// HOURGLASS ===========================================
-//	w1 = 43; h1 = 66; 
-//	el = new SkinElement(this, "hourglass_1", "core_skin", 43, 66, new IntCoord(0, 0, 0, 0));
-//		x = 736; y = 0;	AddStatesCenter(el, h1, w1, x, y);	
-//	el = new SkinElement(this, "hourglass_2", "core_skin", 43, 66, new IntCoord(0, 0, 0, 0));
-//		x = 779; y = 0;	AddStatesCenter(el, h1, w1, x, y);
-//	el = new SkinElement(this, "hourglass_3", "core_skin", 43, 66, new IntCoord(0, 0, 0, 0));
-//		x = 822; y = 0;	AddStatesCenter(el, h1, w1, x, y);	
-//	el = new SkinElement(this, "hourglass_4", "core_skin", 43, 66, new IntCoord(0, 0, 0, 0));
-//		x = 865; y = 0;	AddStatesCenter(el, h1, w1, x, y);	
-//	el = new SkinElement(this, "hourglass_5", "core_skin", 43, 66, new IntCoord(0, 0, 0, 0));
-//		x = 908; y = 0;	AddStatesCenter(el, h1, w1, x, y);	
-//	el = new SkinElement(this, "hourglass_6", "core_skin", 43, 66, new IntCoord(0, 0, 0, 0));
-//		x = 736; y = 66;	AddStatesCenter(el, h1, w1, x, y);	
-//	el = new SkinElement(this, "hourglass_7", "core_skin", 43, 66, new IntCoord(0, 0, 0, 0));
-//		x = 779; y = 66;	AddStatesCenter(el, h1, w1, x, y);	
-//	el = new SkinElement(this, "hourglass_8", "core_skin", 43, 66, new IntCoord(0, 0, 0, 0));
-//		x = 822; y = 66;	AddStatesCenter(el, h1, w1, x, y);	
-//	el = new SkinElement(this, "hourglass_9", "core_skin", 43, 66, new IntCoord(0, 0, 0, 0));
-//		x = 865; y = 66;	AddStatesCenter(el, h1, w1, x, y);	
-//	el = new SkinElement(this, "hourglass_10", "core_skin", 43, 66, new IntCoord(0, 0, 0, 0));
-//		x = 908; y = 66;	AddStatesCenter(el, h1, w1, x, y);	
-//	el = new SkinElement(this, "hourglass_11", "core_skin", 43, 66, new IntCoord(0, 0, 0, 0));
-//		x = 736; y = 132;	AddStatesCenter(el, h1, w1, x, y);	
-//	el = new SkinElement(this, "hourglass_12", "core_skin", 43, 66, new IntCoord(0, 0, 0, 0));
-//		x = 779; y = 132;	AddStatesCenter(el, h1, w1, x, y);	
-//	el = new SkinElement(this, "hourglass_13", "core_skin", 43, 66, new IntCoord(0, 0, 0, 0));
-//		x = 822; y = 132;	AddStatesCenter(el, h1, w1, x, y);	
-//	el = new SkinElement(this, "hourglass_14", "core_skin", 43, 66, new IntCoord(0, 0, 0, 0));
-//		x = 865; y = 132;	AddStatesCenter(el, h1, w1, x, y);	
-//	el = new SkinElement(this, "hourglass_15", "core_skin", 43, 66, new IntCoord(0, 0, 0, 0));
-//		x = 908; y = 132;	AddStatesCenter(el, h1, w1, x, y);	
-//		
 		// HOURGLASS ===========================================
 		w1 = 51; h1 = 112; 
 		el = new SkinElement(this, "hourglass_1", "sand_clock", 51, 112, new IntCoord(0, 0, 0, 0));
@@ -357,8 +322,41 @@ public class Skin_MyGUI extends Skin {
 		el = new SkinElement(this, "hourglass_14", "sand_clock", 51, 112, new IntCoord(0, 0, 0, 0));
 			x = 153; y = 224;	AddStatesCenter(el, h1, w1, x, y);	
 		el = new SkinElement(this, "hourglass_15", "sand_clock", 51, 112, new IntCoord(0, 0, 0, 0));
-			x = 204; y = 224;	AddStatesCenter(el, h1, w1, x, y);		
+			x = 204; y = 224;	AddStatesCenter(el, h1, w1, x, y);
 
-			
-	}
+
+    el = new SkinElement(this, "hotbar_slot_anim_1", "core_skin", 64, 64, new IntCoord(0, 0, 0, 0));
+        w1 = 64; h1 = 64; x = 400; y = 200;
+        AddStatesCenter(el, h1, w1, x, y);
+
+    el = new SkinElement(this, "hotbar_slot_anim_2", "core_skin", 64, 64, new IntCoord(0, 0, 0, 0));
+        w1 = 64; h1 = 64; x = 464; y = 200;
+        AddStatesCenter(el, h1, w1, x, y);
+
+    el = new SkinElement(this, "hotbar_slot_anim_3", "core_skin", 64, 64, new IntCoord(0, 0, 0, 0));
+        w1 = 64; h1 = 64; x = 528; y = 200;
+        AddStatesCenter(el, h1, w1, x, y);
+
+    el = new SkinElement(this, "hotbar_slot_anim_4", "core_skin", 64, 64, new IntCoord(0, 0, 0, 0));
+        w1 = 64; h1 = 64; x = 592; y = 200;
+        AddStatesCenter(el, h1, w1, x, y);
+
+    el = new SkinElement(this, "hotbar_slot_anim_5", "core_skin", 64, 64, new IntCoord(0, 0, 0, 0));
+        w1 = 64; h1 = 64; x = 656; y = 200;
+        AddStatesCenter(el, h1, w1, x, y);
+
+    el = new SkinElement(this, "hotbar_slot", "core_skin", 34, 34, new IntCoord(0, 0, 0, 0));
+        w1 = 34; h1 = 34; x = 466; y = 166;
+        AddStatesCenter(el, h1, w1, x, y);
+
+    el = new SkinElement(this, "hotbar_bg", "core_skin", 35, 35, new IntCoord(0, 0, 3, 3));
+        w1 = 15;	 	w2 = 1; 	w3 = 19;
+        h1 = 15; 	    h2 = 1; 	h3 = 19;
+        x = 504; y = 158;
+        x1 = -1; y1 = -1;
+        x2 = -1; y2 = -1;
+        x3 = -1; y3 = -1;
+        AddStates(el, w1, w2, w3, h1, h2, h3, x, x1, x2, x3, y, y1, y2, y3);
+    }
+
 }

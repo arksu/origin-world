@@ -1,25 +1,22 @@
 /*
- *  This file is part of the Origin-World game client.
- *  Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
+ * This file is part of the Origin-World game client.
+ * Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3 of the License.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package a1;
 
-//import static java.lang.Math.PI;
-
-public class Coord implements Comparable<Coord>, java.io.Serializable {
-	private static final long serialVersionUID = -820389431910193681L;
+public class Coord implements Comparable<Coord> {
 
 	public int x, y;
 	public static Coord z = new Coord();
@@ -41,13 +38,9 @@ public class Coord implements Comparable<Coord>, java.io.Serializable {
 		return new Coord(this);
 	}
 
-//	public Coord(java.awt.Dimension d) {
-//		this(d.width, d.height);
-//	}
-
-//	public static Coord sc(double a, double r) {
-//		return (new Coord((int) (Math.cos(a) * r), -(int) (Math.sin(a) * r)));
-//	}
+	public static Coord sc(double a, double r) {
+		return (new Coord((int) (Math.cos(a) * r), -(int) (Math.sin(a) * r)));
+	}
 
 	public boolean equals(Object o) {
 		if (!(o instanceof Coord))
@@ -95,6 +88,10 @@ public class Coord implements Comparable<Coord>, java.io.Serializable {
 	public Coord mul(double f) {
 		return (new Coord((int) (x * f), (int) (y * f)));
 	}
+
+    public Coord mul(double fx, double fy) {
+        return (new Coord((int) (x * fx), (int) (y * fy)));
+    }
 
 	public Coord inverse() {
 		return (new Coord(-x, -y));

@@ -1,26 +1,27 @@
 /*
- *  This file is part of the Origin-World game client.
- *  Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
+ * This file is part of the Origin-World game client.
+ * Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3 of the License.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package a1.dialogs;
 
 
+import a1.DialogFactory;
+import a1.net.NetGame;
+
 import java.util.Map;
 import java.util.TreeMap;
-
-import a1.DialogFactory;
 
 public abstract class Dialog {
 	public boolean active = false;
@@ -38,7 +39,8 @@ public abstract class Dialog {
             dlg_Context.class,
             dlg_Version.class,
             dlg_Stat.class,
-            dlg_Bug_Report.class
+            dlg_Bug_Report.class,
+            dlg_Hotbars.class
 	};
 
 	static public void Init() {
@@ -62,6 +64,7 @@ public abstract class Dialog {
 		if (IsActive(name)) return false;
 		DialogFactory f = GetType(name);
 		if (f != null) {
+            NetGame.SEND_dialog_open(name);
 			Dialog d = f.create();
 			d.Show();
 			dialogs.put(name, d);
@@ -73,6 +76,7 @@ public abstract class Dialog {
 	static public void Hide(String name) {
 		Dialog d = dialogs.get(name);
 		if (d != null) {
+            NetGame.SEND_dialog_close(name);
 			d.Hide();
 			dialogs.remove(name);
 		}

@@ -1,36 +1,33 @@
 /*
- *  This file is part of the Origin-World game client.
- *  Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
+ * This file is part of the Origin-World game client.
+ * Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3 of the License.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package a1;
 
+
+import a1.utils.BitmapFont;
+import a1.utils.Resource;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.glu.GLU;
+import org.newdawn.slick.Color;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.glu.GLU;
-import org.newdawn.slick.Color;
-import a1.utils.BitmapFont;
-import a1.utils.Resource;
-
 //--------------------------------------------
-import org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL11.glVertex2i;
-import static org.lwjgl.opengl.GL11.glColor4f;
 //---------------------------------------------------
 
 
@@ -86,7 +83,7 @@ public class Render2D {
 		
 		scissors.push(current_scissor);
 		current_scissor = NewRect;
-		GL11.glScissor(NewRect.x, Config.ScreenHeight-NewRect.y-NewRect.h, NewRect.w, NewRect.h);
+		GL11.glScissor(NewRect.x, Config.getScreenHeight()-NewRect.y-NewRect.h, NewRect.w, NewRect.h);
 		//GL11.glScissor(s.x, Config.ScreenHeight-s.y-s.h, s.w, s.h);
 	}
 	
@@ -317,6 +314,7 @@ public class Render2D {
 			f = fonts.get(font_name);
 		if (f == null) f = fonts.get("system");
 		if (f != null) {
+            f.drawString(x+1, y+1, text, new Color(32, 45, 60));
 			f.drawString(x, y, text, col);
 		}
 	}
@@ -347,12 +345,15 @@ public class Render2D {
 		}
 		return 0;
 	}
-	
+
+    static public int GetTextHeight(String font_name) {
+        return GetTextHeight(font_name, "AbcdeqrWklrt");
+    }
 	static public int GetTextHeight(String font_name, String text) {
 		BitmapFont f = font_name.length()==0?fonts.get("system"):fonts.get(font_name);
 		if (f == null) f = fonts.get("system");
 		if (f != null) {
-			return f.getHeight(text);
+            return f.getHeight("AbqprW");
 		}
 		return 0;
 	}

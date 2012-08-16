@@ -1,27 +1,35 @@
 /*
- *  This file is part of the Origin-World game client.
- *  Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
+ * This file is part of the Origin-World game client.
+ * Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3 of the License.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package a1.utils;
 
-import java.io.*;
-import java.util.*;
 import a1.Log;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class INIFile {
 	HashMap<String, String> map = new HashMap<String, String>();
+    private static String SECTION_DELIM = ">>";
+
+    public INIFile() {
+        map.clear();
+    }
 
 	public INIFile(String fname) throws IOException {
 		FileInputStream fs = new FileInputStream(fname);
@@ -82,61 +90,77 @@ public class INIFile {
 
 	}
 	
-//	public void saveFile(String filename) {
-//		try {
-//			List<String> sections_list = new ArrayList<String>();
-//			for (String key : map.keySet()) {
-//				String section = key.split("\\.")[0];
-//			    if (!sections_list.contains(section)) sections_list.add(section);
-//			}
-//			PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(filename), "UTF-8"));
-//			for (String sect : sections_list) {
-//				writer.write("[" + sect + "]\n");
-//				for (String key : map.keySet()) {
-//					String[] keys = key.split("\\.");
-//					if (sect.equals(keys[0])) {
-//						writer.write(keys[1] + "=" + map.get(key) + '\n');
-//					}
-//				}
-//			}
-//			writer.close();
-//		} catch (Exception e) {
-//			Log.info("Error while saving ini file: " + filename);
-//		}
-//	}
+	public void saveFile(File file) {
+		try {
+			List<String> sections_list = new ArrayList<String>();
+			for (String key : map.keySet()) {
+				String section = key.split(SECTION_DELIM)[0];
+			    if (!sections_list.contains(section)) sections_list.add(section);
+			}
+			PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
+			for (String sect : sections_list) {
+				writer.write("[" + sect + "]\n");
+				for (String key : map.keySet()) {
+					String[] keys = key.split(SECTION_DELIM);
+					if (sect.equals(keys[0])) {
+						writer.write(keys[1] + "=" + map.get(key) + '\n');
+					}
+				}
+			}
+			writer.close();
+		} catch (Exception e) {
+			Log.info("Error while saving ini file: " + file.getName());
+		}
+	}
 	
 	public void addProperty(String section, String line) {
 		int equalIndex = line.indexOf("=");
 
 		if (equalIndex > 0) {
-			String name = section + '.' + line.substring(0, equalIndex).trim();
+			String name = section + SECTION_DELIM + line.substring(0, equalIndex).trim();
 			String value = line.substring(equalIndex + 1).trim();
-			if (map.containsKey(name)) map.remove(name);
 			map.put(name, value);
 		}
 	}
 
 	public String getProperty(String section, String var, String def) {
-		String s = map.get(section + '.' + var);
+		String s = map.get(section + SECTION_DELIM + var);
 		if (s == null)
 			return def;
 		else
 			return s;
 	}
+
+    public String getProperty(String section, String var) {
+        String s = map.get(section + SECTION_DELIM + var);
+        if (s == null)
+            return "";
+        else
+            return s;
+    }
 	
 	public void deleteProperty(String section, String var) {
-		if (map.containsKey(section + '.' + var)) map.remove(section + '.' + var);
+		if (map.containsKey(section + SECTION_DELIM + var)) map.remove(section + SECTION_DELIM + var);
 	}
 
 	public int getProperty(String section, String var, int def) {
-		String sval = getProperty(section, var, Integer.toString(def));
-
-		return Integer.decode(sval).intValue();
+		return Integer.decode(getProperty(section, var, Integer.toString(def)));
 	}
 
 	public boolean getProperty(String section, String var, boolean def) {
-		String sval = getProperty(section, var, def ? "True" : "False");
-
-		return sval.equalsIgnoreCase("Yes") || sval.equalsIgnoreCase("True");
+		String sval = getProperty(section, var, def ? "1" : "0");
+		return sval.equalsIgnoreCase("1") || sval.equalsIgnoreCase("True") || sval.equalsIgnoreCase("Yes");
 	}
+
+    public void putProperty(String section, String var, String val) {
+        map.put(section + SECTION_DELIM + var.trim(), val.trim());
+    }
+
+    public void putProperty(String section, String var, int val) {
+        map.put(section + SECTION_DELIM + var.trim(), String.valueOf(val));
+    }
+
+    public void putProperty(String section, String var, boolean val) {
+        map.put(section + SECTION_DELIM + var.trim(), val?"1":"0");
+    }
 }

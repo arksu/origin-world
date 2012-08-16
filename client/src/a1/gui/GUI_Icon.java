@@ -1,20 +1,22 @@
 /*
- *  This file is part of the Origin-World game client.
- *  Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
+ * This file is part of the Origin-World game client.
+ * Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3 of the License.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package a1.gui;
+
+import a1.gui.utils.DragInfo;
 
 import static a1.gui.Skin.StateNormal;
 
@@ -32,5 +34,13 @@ public class GUI_Icon extends GUI_DragControl{
 		else 
 			getSkin().Draw("icon_unknown", abs_pos.x, abs_pos.y, size.x, size.y, StateNormal);
 	}
+
+    public void DoEndDrag(DragInfo info) {
+        // если дропнули не на слот а тащили с хотбара
+        if (!(gui.mouse_in_control instanceof GUI_HotbarSlot) && (drag_parent instanceof GUI_HotbarSlot)) {
+            // чистим слот
+            ((GUI_HotbarSlot)drag_parent).ClearSlot();
+        }
+    }
 
 }

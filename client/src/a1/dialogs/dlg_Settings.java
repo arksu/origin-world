@@ -1,42 +1,28 @@
 /*
- *  This file is part of the Origin-World game client.
- *  Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
+ * This file is part of the Origin-World game client.
+ * Copyright (C) 2012 Arkadiy Fattakhov <ark@ark.su>
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3 of the License.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package a1.dialogs;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import a1.*;
+import a1.gui.*;
 import org.lwjgl.opengl.DisplayMode;
 import org.newdawn.slick.openal.SoundStore;
 
-import a1.Config;
-import a1.Coord;
-import a1.DialogFactory;
-import a1.Lang;
-import a1.Main;
-import a1.Sound;
-import a1.gui.GUI;
-import a1.gui.GUI_Button;
-import a1.gui.GUI_Checkbox;
-import a1.gui.GUI_ComboBox;
-import a1.gui.GUI_Edit;
-import a1.gui.GUI_Label;
-import a1.gui.GUI_Panel;
-import a1.gui.GUI_Scrollbar;
-import a1.gui.GUI_Window;
+import java.util.ArrayList;
+import java.util.List;
 
 public class dlg_Settings extends Dialog {
 	public static dlg_Settings dlg = null;
@@ -44,7 +30,7 @@ public class dlg_Settings extends Dialog {
 	public GUI_Edit fps_edit;
 	public GUI_Button btn_ok;
 	public GUI_Checkbox start_fullscreen, sound_enabled, debug_engine, count_objs, hide_overlapped,
-    move_by_mouse;
+    move_by_mouse, zoom_by_wheel, zoom_over_mouse, reduce_bg, vsync;
 	public GUI_Scrollbar music_vol, sound_vol;
 	public GUI_Label lbl_resolution, lbl_fps, lbl1, lbl2, lbl_music, lbl_sound;
 	public GUI_ComboBox resolution;
@@ -72,7 +58,7 @@ public class dlg_Settings extends Dialog {
 			protected void DoClose() {
 				dlg_Settings.dlg.wnd = null;
 				Dialog.Hide("dlg_settings");
-			};
+			}
 		};
 		wnd.caption = Lang.getTranslate("options", "wnd_caption");
 
@@ -86,22 +72,22 @@ public class dlg_Settings extends Dialog {
 				panel_mode = 0;
 				main_panel.visible = true;
 				game_panel.visible = false;
-			};
+			}
 		
 			protected boolean getPressed() {
 				return panel_mode == 0;
-			};
+			}
 		};	
 		game_btn = new GUI_Button(wnd) {
 			public void DoClick() {
 				panel_mode = 1;
 				main_panel.visible = false;
 				game_panel.visible = true;
-			};
+			}
 		
 			protected boolean getPressed() {
 				return panel_mode == 1;
-			};			
+			}
 		};
 		main_btn.caption = Lang.getTranslate("options", "main_tab");
 		game_btn.caption = Lang.getTranslate("options", "game_tab");
@@ -180,7 +166,7 @@ public class dlg_Settings extends Dialog {
 		start_fullscreen = new GUI_Checkbox(main_panel);
 		start_fullscreen.SetSize(200, 21);
 		start_fullscreen.caption = Lang.getTranslate("options", "start_fullscreen");
-		start_fullscreen.checked = Config.StartFullscreen;
+		start_fullscreen.checked = Config.isFullscreen;
 		start_fullscreen.simple_hint = Lang.getTranslate("options", "apply_after");
 
 		debug_engine = new GUI_Checkbox(main_panel);
@@ -189,7 +175,19 @@ public class dlg_Settings extends Dialog {
 		debug_engine.checked = Config.DebugEngine;
 		debug_engine.simple_hint = Lang.getTranslate("options", "apply_after");
 
-		sound_enabled = new GUI_Checkbox(main_panel) {
+        vsync = new GUI_Checkbox(main_panel);
+        vsync.SetSize(200, 21);
+        vsync.caption = Lang.getTranslate("options", "vsync");
+        vsync.checked = Config.VSync;
+
+        reduce_bg = new GUI_Checkbox(main_panel);
+        reduce_bg.SetSize(200, 21);
+        reduce_bg.caption = Lang.getTranslate("options", "reduce_bg");
+        reduce_bg.checked = Config.ReduceInBackground;
+
+
+
+        sound_enabled = new GUI_Checkbox(main_panel) {
 			public void DoClick() {
 				Config.SoundEnabled = sound_enabled.checked;
 				if (!Config.SoundEnabled)
@@ -261,6 +259,24 @@ public class dlg_Settings extends Dialog {
         move_by_mouse.checked = Config.move_inst_left_mouse;
         move_by_mouse.SetSize(200, 21);
         move_by_mouse.caption = Lang.getTranslate("options", "move_inst_left_mouse");
+
+        zoom_by_wheel = new GUI_Checkbox(game_panel) {
+            public void DoClick() {
+                Config.zoom_by_wheel = zoom_by_wheel.checked;
+            }
+        };
+        zoom_by_wheel.checked = Config.zoom_by_wheel;
+        zoom_by_wheel.SetSize(200, 21);
+        zoom_by_wheel.caption = Lang.getTranslate("options", "zoom_by_wheel");
+
+        zoom_over_mouse = new GUI_Checkbox(game_panel) {
+            public void DoClick() {
+                Config.zoom_over_mouse = zoom_over_mouse.checked;
+            }
+        };
+        zoom_over_mouse.checked = Config.zoom_over_mouse;
+        zoom_over_mouse.SetSize(200, 21);
+        zoom_over_mouse.caption = Lang.getTranslate("options", "zoom_over_mouse");
 		
 		//-----------------------------------------------------------------------------
 
@@ -288,7 +304,7 @@ public class dlg_Settings extends Dialog {
 						Config.ScreenHeight_to_save = Config.ScreenHeight;
 					}
 				}
-				Config.StartFullscreen = start_fullscreen.checked;
+				Config.isFullscreen = start_fullscreen.checked;
 				Config.SoundEnabled = sound_enabled.checked;
 				Config.DebugEngine = debug_engine.checked;
 				Config.MusicVolume = music_vol.getPos();
@@ -296,7 +312,10 @@ public class dlg_Settings extends Dialog {
 				Config.count_objs = count_objs.checked;
 				Config.hide_overlapped = hide_overlapped.checked;
                 Config.move_inst_left_mouse = move_by_mouse.checked;
-
+                Config.zoom_by_wheel = zoom_by_wheel.checked;
+                Config.zoom_over_mouse = zoom_over_mouse.checked;
+                Config.VSync = vsync.checked;
+                Config.ReduceInBackground = reduce_bg.checked;
 				try {
 					Config.FrameFate = Integer.parseInt(fps_edit.text);
 				} catch (Exception e) {
@@ -341,7 +360,9 @@ public class dlg_Settings extends Dialog {
 		start_fullscreen.SetPos(15, fps_edit.pos.y + 35);
 		start_fullscreen.SetPos(15, fps_edit.pos.y + 35);
 		debug_engine.SetPos(15, start_fullscreen.pos.y + 35);
-		sound_enabled.SetPos(15, debug_engine.pos.y + 35);
+        vsync.SetPos(15, debug_engine.pos.y + 35);
+        reduce_bg.SetPos(15, vsync.pos.y + 35);
+		sound_enabled.SetPos(15, reduce_bg.pos.y + 35);
 		lbl_music.SetPos(resolution.pos.x, sound_enabled.pos.y + 35);
 		music_vol.SetPos(15, lbl_music.pos.y + 20);
 		lbl_sound.SetPos(resolution.pos.x, music_vol.pos.y + 35);
@@ -352,6 +373,8 @@ public class dlg_Settings extends Dialog {
 		count_objs.SetPos(10, 10);
 		hide_overlapped.SetPos(10, count_objs.pos.y+35);
         move_by_mouse.SetPos(10, hide_overlapped.pos.y+35);
+        zoom_by_wheel.SetPos(10, move_by_mouse.pos.y+35);
+        zoom_over_mouse.SetPos(10, zoom_by_wheel.pos.y+35);
 		
 		btn_ok.SetPos(wnd.size.x - btn_ok.size.x - 15, wnd.size.y - btn_ok.size.y - 15);
 		wnd.Center();
