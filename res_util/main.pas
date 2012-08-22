@@ -807,7 +807,6 @@ procedure TResSprite.Parse(node: TXML);
 begin
   z := StrToIntDef(node.Params['z'].Value, 10);
   addz := StrToIntDef(node.Params['addz'].Value, 0);
-  if addz < 0 then addz := 32768 - addz;
 
   offset := StrToPoint(node.Params['offset'].Value);
   tex_name := node.Params['texture'].Value;
@@ -982,7 +981,6 @@ var
 begin
   z := StrToIntDef(node.Params['z'].Value, 10);
   addz := StrToIntDef(node.Params['addz'].Value, 0);
-  if addz < 0 then addz := 32768 - addz;
 
   offset := StrToPoint(node.Params['offset'].Value);
   time := StrToIntDef(node.Params['time'].Value, 0);
