@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package a1;
 
 import static a1.MapCache.GRID_SIZE;
@@ -32,7 +33,7 @@ public class Grid {
         trans_cache = new Sprite[GRID_SIZE][GRID_SIZE][];
 		tiles = new byte[GRID_SIZE][GRID_SIZE];
 		levels = new byte[GRID_SIZE][GRID_SIZE];
-		fill_tiles(data);
+        fill_tiles(data);
 		fill_levels(data);
 //        save_debug();
 	}
@@ -60,12 +61,12 @@ public class Grid {
 	}
 	
 	public int gettile(Coord tc) {
-		return(tiles[tc.y][tc.x]);
+		return(tiles[tc.y][tc.x] & 0xff);
 	}
 	
 	public int gettile(int x, int y) {
 		// yep, its right.
-		return(tiles[y][x]);
+		return(tiles[y][x] & 0xff);
 	}
 
 	public int getlevel(Coord tc) {

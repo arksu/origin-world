@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package a1;
 
 import a1.gui.GUI_Map;
@@ -26,8 +27,9 @@ import static org.lwjgl.opengl.GL11.*;
 public class Sprite {
 	private static Color static_color = null;
 	public static int binded_texture_id = -1;
-	
-	private Texture		texture;
+    public static Sprite dummy = new Sprite("");
+
+	private Texture		texture = null;
 	private String 		texture_name = "";
 	
 	// texture coords
@@ -37,16 +39,16 @@ public class Sprite {
 	private int			th;
 	private int			offx;
 	private int			offy;
-
 	public Sprite(Texture texture) {
-		this.texture = texture;
-		tx = 0;
-		ty = 0;
-		tw = texture.getImageWidth();
-		th = texture.getImageHeight();
+            this.texture = texture;
+            tx = 0;
+            ty = 0;
+            tw = texture.getImageWidth();
+            th = texture.getImageHeight();
 	}
 	
 	public Sprite(String tex_name) {
+        if (tex_name.equals("")) return;
 		this.texture_name = tex_name;
 		texture = Resource.textures.get(tex_name);
 		tx = 0;
@@ -179,7 +181,8 @@ public class Sprite {
 
 	}
 
-	public void draw2(Coord sc) {
+	public void draw_map_vbo(Coord sc) {
+        if (texture == null) return;
 		if (GUI_Map.tile_vboSize < GUI_Map.tile_Offset + 16)
 			return;
 		
@@ -191,25 +194,25 @@ public class Sprite {
 		float newTextureWidth = tw / texwidth;
 		float newTextureHeight = th / texheight;
 		
-		putVert(sc.x, sc.y);
-		putTex(newTextureOffsetX,newTextureOffsetY);
+		map_vbo_putVert(sc.x, sc.y);
+		map_vbo_putTex(newTextureOffsetX, newTextureOffsetY);
 		
-		putVert(sc.x, sc.y + th);
-		putTex(newTextureOffsetX, newTextureOffsetY+newTextureHeight);
+		map_vbo_putVert(sc.x, sc.y + th);
+		map_vbo_putTex(newTextureOffsetX, newTextureOffsetY + newTextureHeight);
 		
-		putVert(sc.x + tw, sc.y + th);
-		putTex(newTextureOffsetX + newTextureWidth,	newTextureOffsetY + newTextureHeight);
+		map_vbo_putVert(sc.x + tw, sc.y + th);
+		map_vbo_putTex(newTextureOffsetX + newTextureWidth, newTextureOffsetY + newTextureHeight);
 		
-		putVert(sc.x + tw, sc.y);
-		putTex(newTextureOffsetX + newTextureWidth, newTextureOffsetY);		
+		map_vbo_putVert(sc.x + tw, sc.y);
+		map_vbo_putTex(newTextureOffsetX + newTextureWidth, newTextureOffsetY);
 	}
 
-	private void putTex(float x, float y) {
+	private void map_vbo_putTex(float x, float y) {
 		GUI_Map.tile_vboUpdate[GUI_Map.tile_Offset++] = x;
 		GUI_Map.tile_vboUpdate[GUI_Map.tile_Offset++] = y;
 	}
 
-	private void putVert(int x, int y) {	
+	private void map_vbo_putVert(int x, int y) {
 		GUI_Map.tile_vboUpdate[GUI_Map.tile_Offset++] = x;
 		GUI_Map.tile_vboUpdate[GUI_Map.tile_Offset++] = y;
 	}

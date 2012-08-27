@@ -14,8 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package a1;
 
+import a1.gui.GUI_Map;
 import a1.utils.FlyParam;
 import org.newdawn.slick.Color;
 
@@ -67,7 +69,7 @@ public class FlyText {
 
 			Render2D.Text("default", 
 					dc.x - Render2D.GetTextWidth("default", msg)/2, 
-					dc.y-dy - 85,  
+					(int)(dc.y-dy - 35 - 40 * GUI_Map.scale),
 					msg, new Color(c.getRed(), c.getGreen(), c.getBlue(), a));
 		}
 	}

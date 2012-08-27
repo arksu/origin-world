@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package a1.net;
 
 public class NetPacketsID {
@@ -76,5 +77,7 @@ public class NetPacketsID {
     static final int GAMESERVER_OBJECT_CLOSE = 156;
     static final int GAMESERVER_OBJECT_VISUAL_STATE = 157;
     static final int GAMESERVER_OBJECT_VISUAL_STATE_ACK = 158;
-
+    static final int GAMESERVER_CLAIM_REMOVE = 159;
+    static final int GAMESERVER_CLAIM_CHANGE = 160;
+    static final int GAMESERVER_CLAIM_EXPAND = 161;
 }

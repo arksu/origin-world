@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package a1.utils;
 
 
@@ -585,7 +586,7 @@ public class Resource implements Prioritized {
 			z = Utils.int16d(data, off); off += 2;
             tag = Utils.int16d(data, off); off += 2;
 			addz = Utils.int16d(data, off); off += 2;
-			
+
 			offx = Utils.int16d(data, off); off += 2;
 			offy = Utils.int16d(data, off); off += 2;
 			

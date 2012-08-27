@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package a1;
 
 import a1.utils.MyThread;
@@ -46,7 +47,7 @@ public class Connection {
     String server_addr;
     public ConnectionState state = ConnectionState.CONNECTING;
     public int network_error = 0;
-    public LinkedList<Packet> packets;
+    public final LinkedList<Packet> packets;
 
     RecvWorker recv_worker;
 
@@ -127,7 +128,7 @@ public class Connection {
                     }
                     buf = cur_packet.add_data(buf, 0, buf.length);
                     if (cur_packet.is_ready()) {
-                        synchronized(Connection.this) {
+                        synchronized(packets) {
                             //Log.info("recv packet "+cur_packet.toString());
                             cur_packet.offset = 0;
                             packets.addFirst(cur_packet);

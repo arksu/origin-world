@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package a1;
 
 public class Coord implements Comparable<Coord> {
@@ -166,6 +167,10 @@ public class Coord implements Comparable<Coord> {
 		long dy = o.y - y;
 		return (Math.sqrt((dx * dx) + (dy * dy)));
 	}
+
+    public int area() {
+        return x * y;
+    }
 	
 
 }

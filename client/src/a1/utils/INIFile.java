@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package a1.utils;
 
 import a1.Log;
@@ -99,11 +100,12 @@ public class INIFile {
 			}
 			PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
 			for (String sect : sections_list) {
-				writer.write("[" + sect + "]\n");
+                String sep = System.getProperty("line.separator");
+				writer.write("[" + sect + "]" + sep);
 				for (String key : map.keySet()) {
 					String[] keys = key.split(SECTION_DELIM);
 					if (sect.equals(keys[0])) {
-						writer.write(keys[1] + "=" + map.get(key) + '\n');
+						writer.write(keys[1] + "=" + map.get(key) + sep);
 					}
 				}
 			}

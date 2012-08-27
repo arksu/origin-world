@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package a1.net;
 
 import a1.*;
@@ -325,6 +326,12 @@ public class NetGame {
             break;
         case GAMESERVER_OBJECT_VISUAL_STATE :
             ObjectVisual.RecvVisualState(pkt);
+            break;
+        case GAMESERVER_CLAIM_REMOVE :
+            Claims.RecvClaimRemove(pkt);
+            break;
+        case GAMESERVER_CLAIM_CHANGE :
+            Claims.RecvClaimChange(pkt);
             break;
 			
 		default :

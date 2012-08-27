@@ -51,6 +51,7 @@ public class ObjectVisual {
             try {
                 //-------------------------
                 if ("runestone".equals(obj_type)) ov = new runestone();
+                if ("claim".equals(obj_type)) ov = new claim();
                 //-------------------------
 
                 if (ov != null) {

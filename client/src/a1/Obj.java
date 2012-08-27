@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package a1;
 
 import a1.gui.GUI;
@@ -136,7 +137,6 @@ public class Obj {
 			objc = getpos();
 			prepare_draw_coord( m2s(objc).add(oc));
 		}
-
 	}
 	
 	private void prepare_draw_coord(Coord c) {
@@ -192,7 +192,6 @@ public class Obj {
 					}
 				}
 
-
                 // посмотрим в воде ли игрок?
                 byte tile = MapCache.GetTile(objc.div(TILE_SIZE));
                 if (tile == MapCache.TILE_WATER_LOW) {
@@ -208,7 +207,17 @@ public class Obj {
                     // руки вверх
                     tags.add(2);
                 } else {
+                    // руки вниз
                     tags.add(1);
+                    // TODO: индивидуально проверить каждую руку
+                }
+
+                // выставим ноги
+                if (follow_id != 0) {
+                    // сидим
+                    tags.add(11);
+                } else {
+                    tags.add(10);
                 }
 
                 // игрока выводим игнорируя перекрытия. он должен быть видим всегда

@@ -32,6 +32,7 @@ public class GUI_SpinEdit extends GUI_Control {
     public int max, min, value;
     public String font = "default";
     public Color text_color = Color.white;
+    public int step = 1;
 
     GUI_Button btn_inc, btn_dec;
     boolean pressed = false;
@@ -70,21 +71,37 @@ public class GUI_SpinEdit extends GUI_Control {
 
     public void DoInc() {
         if (value < max) {
-            value++;
+            value += step;
+            if (value > max) value = max;
             DoChanged();
         }
     }
 
     public void DoDec() {
         if (value > min) {
-            value--;
+            value -= step;
+            if (value < min) value = min;
             DoChanged();
         }
     }
 
-    public void DoChanged() {
-
+    public void DoInc2() {
+        if (value < max) {
+            value += step*10;
+            if (value > max) value = max;
+            DoChanged();
+        }
     }
+
+    public void DoDec2() {
+        if (value > min) {
+            value -= step*10;
+            if (value < min) value = min;
+            DoChanged();
+        }
+    }
+
+    public void DoChanged() { }
 
     public void DoSetSize() {
         btn_dec.SetPos(0,(size.y-btn_dec.Height()) / 2);
@@ -152,6 +169,10 @@ public class GUI_SpinEdit extends GUI_Control {
                     DoInc();
                 else if (key == Keyboard.KEY_DOWN || key == Keyboard.KEY_LEFT)
                     DoDec();
+                else if (key == Keyboard.KEY_PRIOR)
+                    DoInc2();
+                else if (key == Keyboard.KEY_NEXT)
+                    DoDec2();
             }
             return true;
         } else

@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package a1;
 
 import a1.dialogs.dlg_Game;
@@ -101,6 +102,10 @@ public class ObjParam extends ObjAttr {
 
         else if (newp.type.equals("ashow")) {
             o.ignore_overlap = true;
+        }
+
+        else if (newp.type.equals("direction")) {
+            o.direction = Utils.ErlangInt(newp.term);
         }
 	}
 

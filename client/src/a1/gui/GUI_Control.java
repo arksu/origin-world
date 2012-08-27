@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package a1.gui;
 
 import a1.*;
@@ -408,7 +409,7 @@ public class GUI_Control {
 		return gui.drag_move_control == this;
 	}
 	
-	protected Skin getSkin() {
+	public Skin getSkin() {
 		return Main.skin;
 	}
 	

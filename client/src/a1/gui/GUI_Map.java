@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package a1.gui;
 
 import a1.*;
@@ -36,25 +37,32 @@ import static a1.net.NetGame.SEND_map_click;
 import static org.lwjgl.opengl.GL11.*;
 
 public class GUI_Map extends GUI_Control {
-	
-	// 7000 тайлов * 4 вершины * 4 атрибута
-	public static int tile_vboSize = 80000 * 4 * 4;
+
+    public static int VBO_SIZE = 80000;
+	public static int tile_vboSize = VBO_SIZE * 4 * 4;
 	//
-	public static int tileGrid_vboSize = 80000 * 4 * 2;
+	public static int tileGrid_vboSize = VBO_SIZE * 4 * 2;
 	//
+	public static int claim_vboSize = 1000 * 6 * 4;
+
 	public static float[] tile_vboUpdate = new float[tile_vboSize];
 	public static float[] tileGrid_vboUpdate = new float[tile_vboSize];
+	public static float[] claim_vboUpdate = new float[tile_vboSize];
 	public static int tile_Offset = 0;
 	public static int tileGrid_Offset = 0;
+	public static int claim_Offset = 0;
 	//
 	public static int tile_drawCount = 0;
 	public static int tileGrid_drawCount = 0;
+	public static int claim_drawCount = 0;
 	private static int tile_vbo;
 	private static int tileGrid_vbo;
+	private static int claim_vbo;
 	
 	///////////////
 	public static boolean render_rects = false;
 	public static boolean render_lightmap = false;
+    public static boolean render_claims = true;
 	/////////////////
 	public static final Coord tile_tex_size = new Coord(50, 25);
 	public static final Coord tilewall_tex_size = new Coord(64, 20);
@@ -82,6 +90,8 @@ public class GUI_Map extends GUI_Control {
 	
 	private long last_time_mouse_send = 0;
     private boolean mouse_left_pressed = false;
+    private boolean mouse_middle_pressed = false;
+    private Coord mouse_middle_press_coord;
     private boolean render_tiles = true;
     private boolean render_objects = true;
     private boolean gui_map_rendered = true;
@@ -106,6 +116,7 @@ public class GUI_Map extends GUI_Control {
 	private void initVBO() {
 		tile_vbo = GL15.glGenBuffers();
 		tileGrid_vbo = GL15.glGenBuffers();
+		claim_vbo = GL15.glGenBuffers();
 		
 		FloatBuffer data = BufferUtils.createFloatBuffer(tile_vboSize);	
 		
@@ -115,6 +126,11 @@ public class GUI_Map extends GUI_Control {
 		data = BufferUtils.createFloatBuffer(tileGrid_vboSize);
 
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, tileGrid_vbo);
+		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, data, GL15.GL_DYNAMIC_DRAW);
+
+		data = BufferUtils.createFloatBuffer(claim_vboSize);
+
+		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, claim_vbo);
 		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, data, GL15.GL_DYNAMIC_DRAW);
 
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);		
@@ -219,6 +235,7 @@ public class GUI_Map extends GUI_Control {
 	public void DoDestroy() {
 		GL15.glDeleteBuffers(tile_vbo);
 		GL15.glDeleteBuffers(tileGrid_vbo);
+		GL15.glDeleteBuffers(claim_vbo);
 		super.DoDestroy();
 	}
 
@@ -228,8 +245,6 @@ public class GUI_Map extends GUI_Control {
 
 		if (render_lightmap) CreateLightMap();
 		
-		GL11.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-		//GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
 		RenderedObjects = 0;
         GL11.glPushMatrix();
         GL11.glScalef(scale, scale, 1.0f);
@@ -263,6 +278,7 @@ public class GUI_Map extends GUI_Control {
 		
 		tile_drawCount = tile_Offset / 4;
 		tileGrid_drawCount = tileGrid_Offset / 2;
+		claim_drawCount = claim_Offset / 4;
 
 		FloatBuffer data = BufferUtils.createFloatBuffer(tile_Offset);
 		data.put(tile_vboUpdate, 0, tile_Offset);
@@ -276,17 +292,34 @@ public class GUI_Map extends GUI_Control {
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, tileGrid_vbo);
 		GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, data);
 
+		data = BufferUtils.createFloatBuffer(claim_Offset);
+		data.put(claim_vboUpdate, 0, claim_Offset);
+		data.flip();
+		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, claim_vbo);
+		GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, data);
+
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);	
 
-		// Arrays.fill(tile_vboUpdate, 0);
 		tile_Offset = 0;
 		tileGrid_Offset = 0;
+		claim_Offset = 0;
 	}
 
 	// обработчик нажатия кнопок мыши
 	public boolean DoMouseBtn(int btn, boolean down) {
         if (btn == Input.MB_LEFT) mouse_left_pressed = MouseInMe() && down;
-		if (!MouseInMe() &&  down) return false;
+		if (!MouseInMe() && down) return false;
+
+        if (btn == Input.MB_MIDDLE && MouseInMe())
+            if (down) {
+                mouse_middle_pressed = true;
+                mouse_middle_press_coord = gui.mouse_pos.clone();
+            }else {
+                if (mouse_middle_pressed && gui.mouse_pos.dist(mouse_middle_press_coord) < 5) {
+                    scale = 1.0f;
+                    updateScale();
+                }
+            }
 		
 		// обработаем камеру
 		if (camera != null) {
@@ -537,6 +570,31 @@ public class GUI_Map extends GUI_Control {
 				}
 			}
 
+            if (render_claims) {
+				for (ClaimPersonal claim : Claims.claims.values()) {
+
+					if (claim_vboSize < claim_Offset + 24)
+						return;
+
+                    Color col;
+					if (Player.CharID == claim.owner_id)
+						col = new Color(0f, 1f, 1f, 0.25f);
+					else
+						col = new Color(1f, 0f, 0f, 0.25f);
+
+                    putClaim(claim, oc, col);
+                }
+
+                if (Claims.expand_claim != null) {
+                    if (claim_vboSize < claim_Offset + 24)
+                        return;
+
+                    Color col = new Color(0f, 0f, 0.8f, 0.17f);
+
+                    putClaim(Claims.expand_claim, oc, col);
+                }
+            }
+
 			//
 			updateVBO();
 		}
@@ -556,6 +614,15 @@ public class GUI_Map extends GUI_Control {
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 		GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
 
+		if (render_claims) {
+			GL11.glEnableClientState(GL11.GL_COLOR_ARRAY);
+			GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, claim_vbo);
+			GL11.glColorPointer(4, GL11.GL_FLOAT, 24, 0L);
+			GL11.glVertexPointer(2, GL11.GL_FLOAT, 24, 16L);
+			GL11.glDrawArrays(GL11.GL_QUADS, 0, claim_drawCount);
+			GL11.glDisableClientState(GL11.GL_COLOR_ARRAY);
+		}
+
 		if (Config.tile_grid) {
 			GL11.glColor4f(0.0f, 0.0f, 0.0f, 0.4f);
 			GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, tileGrid_vbo);
@@ -567,7 +634,40 @@ public class GUI_Map extends GUI_Control {
 		GL11.glDisableClientState(GL11.GL_VERTEX_ARRAY);
 
 	}
-	
+
+    private void putClaim(ClaimPersonal c, Coord oc, Color col) {
+        Coord lt = m2s(c.lt).mul(TILE_SIZE).add(oc);
+        Coord lb = m2s(new Coord(c.lt.x, c.rb.y + 1)).mul(
+                TILE_SIZE).add(oc);
+        Coord rt = m2s(new Coord(c.rb.x + 1, c.lt.y)).mul(
+                TILE_SIZE).add(oc);
+        Coord rb = m2s(c.rb.add(1, 1)).mul(TILE_SIZE).add(oc);
+
+        putColor(col);
+        putPoint(lt);
+
+        putColor(col);
+        putPoint(rt);
+
+        putColor(col);
+        putPoint(rb);
+
+        putColor(col);
+        putPoint(lb);
+    }
+
+	private void putColor(Color color) {
+		claim_vboUpdate[claim_Offset++] = color.r;
+		claim_vboUpdate[claim_Offset++] = color.g;
+		claim_vboUpdate[claim_Offset++] = color.b;
+		claim_vboUpdate[claim_Offset++] = color.a;
+	}
+
+	private void putPoint(Coord point) {
+		claim_vboUpdate[claim_Offset++] = point.x;
+		claim_vboUpdate[claim_Offset++] = point.y;
+	}
+
 	public void PrepareRenderParts() {
 		Coord oc = viewoffset(scaled_size, mc);
 		render_parts.clear();
@@ -641,7 +741,7 @@ public class GUI_Map extends GUI_Control {
 				
 				p.render();
 				
-				if (Config.hide_overlapped && !p.ignore_overlap) {
+				if (Config.hide_overlapped && (!p.ignore_overlap || p.is_my_player)) {
 					if (p.is_my_player && p.z > 1) {
 						if (!player_rendered)
 							player_rect = new Rect(p.screen_coord, p.size);
@@ -666,14 +766,12 @@ public class GUI_Map extends GUI_Control {
 		        }
 		        if (mouse_in_object == null && Config.hide_overlapped) {
 		        	ignore_overlapped = true;
-			        for(int u = 0; u < render_parts.size(); u++)
-			        {
-			            RenderPart p = render_parts.get(u);
-			            if (p.is_overlapped && p.owner != place_obj && p.check_hit(gui.mouse_pos.mul(1 / scale))) {
-			        		mouse_in_object = p.owner;
-			        		break;
-			        	}
-			        }
+                    for (RenderPart p : render_parts) {
+                        if (p.is_overlapped && p.owner != place_obj && p.check_hit(gui.mouse_pos.mul(1 / scale))) {
+                            mouse_in_object = p.owner;
+                            break;
+                        }
+                    }
 		        }
 	        }
 
@@ -702,7 +800,8 @@ public class GUI_Map extends GUI_Control {
 		
 			///////////
 			if (Config.debug) {
-				nick +=" dir="+o.direction;
+                nick += " id="+o.id;
+				nick += " dir="+o.direction;
 				// направление движения
 				LineMove l = o.getattr(LineMove.class);
 				if (l != null) {
@@ -713,7 +812,7 @@ public class GUI_Map extends GUI_Control {
 					nick += " move";
 				}
 			}
-			if (kin != null) {
+			if (kin != null){// || Config.debug) {
                 GL11.glPushMatrix();
                 GL11.glLoadIdentity();
 				Render2D.Text("default", dc.x, dc.y-10-Math.round(38*(scale)),0,0, Render2D.Align_Center, nick, Color.white);
@@ -775,7 +874,7 @@ public class GUI_Map extends GUI_Control {
 	public void drawtile(Coord tc, Coord sc) {	
 		Sprite s = MapCache.getground(tc);
 		if (s != null) { 
-			s.draw2(sc); 
+			s.draw_map_vbo(sc);
 			RenderedTiles++;
 		}
 		
@@ -783,182 +882,11 @@ public class GUI_Map extends GUI_Control {
 		if (ss != null)
 		for (Sprite s1 : ss) {
 			if (s1 != null) {
-				s1.draw2(sc);
+				s1.draw_map_vbo(sc);
 				RenderedTiles++;
 			}
 		}
 	}
-	
-	/*
-	// отрисовать указанный тайл в экранных координатах
-	// а также вывести объекты находящиеся на нем
-	public void drawtile_levels(Coord tc, Coord sc) {
-		Sprite s, wall;
-		int lv, my_lv=0;
-		Tile t = new Tile(tc);
-		boolean is_water = t.is_water;
-		s = t.ground;
-		wall = t.wall;
-		if (render_tile_levels) {			
-			lv = t.level;
-			my_lv = lv;
-			if (is_water && lv < WATER_LEVEL)
-				lv = WATER_LEVEL;
-			if (my_lv >= WATER_LEVEL) is_water = false;
-		} else {
-			if (is_water) s = water;
-			lv = 0;
-		}
-		// посмотрим какого уровня вокруг тайлы
-		// если есть перепад больше уровня боковой стенки - надо вывести под собой столбец из тайлов
-		int lv1 = (lv - Tile.getlevel(tc.add(1, 0)));
-		int lv2 = (lv - Tile.getlevel(tc.add(0, 1)));
-		int h = Math.max(Math.max(0, lv1),lv2);
-		if (is_water && lv-h>=my_lv) 
-			h = lv-my_lv+1; 
-		if (h==0) h = 1;
-
-		int dyy = -1;
-		if (s != null) {
-			int i = h - 1;
-			for (int l = lv - h + 1; l <= lv; l++) {
-				int dy = (i) * TILE_WALL_HEIGHT - lv * TILE_WALL_HEIGHT;
-				if (is_water) {
-					if (l == lv) {
-						if (render_tile_levels && dyy < 0 && mouse_in_tilelevel(sc.add(0, dy))) {
-							dyy = dy;
-							// проверяем в тайле ли мышь
-							Coord ac = s2m(gui.mouse_pos.sub(sc.add(0, dyy)).sub(31, 0));
-							if (ac.x >= 0 && ac.x < TILE_SIZE && ac.y >= 0 && ac.y < TILE_SIZE) {
-								mouse_map_pos = tc.mul(TILE_SIZE).add(ac);
-								mouse_tile_coord = tilify(mouse_map_pos);
-							}
-						}
-						water.draw(sc.add(0, dy));
-					} else if (l < lv && l > my_lv) {
-						water_wall.draw(sc.add(0, dy + WALL_OFFSET));
-					} else if (l == my_lv) {
-						if (render_tile_levels && dyy < 0 && mouse_in_tilelevel(sc.add(0, dy))) {
-							dyy = dy;
-							// проверяем в тайле ли мышь
-							Coord ac = s2m(gui.mouse_pos.sub(sc.add(0, dyy)).sub(31, 0));
-							if (ac.x >= 0 && ac.x < TILE_SIZE && ac.y >= 0 && ac.y < TILE_SIZE) {
-								mouse_map_pos = tc.mul(TILE_SIZE).add(ac);
-								mouse_tile_coord = tilify(mouse_map_pos);
-							}
-						}
-						s.draw(sc.add(0, dy));
-					} else {
-						wall.draw(sc.add(0, dy + WALL_OFFSET));
-					}
-				} else {
-					if (l == lv) {
-						if (render_tile_levels && dyy < 0 && mouse_in_tilelevel(sc.add(0, dy))) {
-							dyy = dy;
-							// проверяем в тайле ли мышь
-							Coord ac = s2m(gui.mouse_pos.sub(sc.add(0, dyy)).sub(31, 0));
-							if (ac.x >= 0 && ac.x < TILE_SIZE && ac.y >= 0 && ac.y < TILE_SIZE) {
-								mouse_map_pos = tc.mul(TILE_SIZE).add(ac);
-								mouse_tile_coord = tilify(mouse_map_pos);
-							}
-						}
-						s.draw(sc.add(0, dy));
-					} else {
-						wall.draw(sc.add(0, dy + WALL_OFFSET));
-					}
-				}
-				i--;
-				RenderedTiles++;
-			}
-		}
-		
-
-		
-		// теперь надо вывести все объекты на этом тайле
-		if (render_tile_levels) {
-			render_tile_objects(tc);
-//			Coord tt;
-//			int l2, l3, l4, l5;
-//			l2 = MapCache.getlevel(tc.add(0, 1));
-//			l3 = MapCache.getlevel(tc.add(1, 1)); 
-//			l4 = MapCache.getlevel(tc.add(1, 0));
-//			l5 = MapCache.getlevel(tc.add(1, -1));
-//			
-//			// если все тайлы вокруг меня выше либо равны мне - выводим свои объекты
-//			if (
-//					(l2>lv && l3>lv && l4>lv && l5>lv) 
-//							
-//				) render_tile_objects(tc);
-//			
-//			
-//			// проверяем 5 тайлов выше меня
-//			// если истина - выводим его объекты
-//			tt = tc.add(-1, 1);
-//			if (check_render_tile(tt,tc,lv,4)) render_tile_objects(tt);
-//			
-//			tt = tc.add(-1, 0);
-//			if (check_render_tile(tt,tc,lv,3)) render_tile_objects(tt);
-//			
-//			tt = tc.add(-1, -1);
-//			if (check_render_tile(tt,tc,lv,2)) render_tile_objects(tt);
-//			
-//			tt = tc.add(0, -1);
-//			if (check_render_tile(tt,tc,lv,1)) render_tile_objects(tt);
-			
-		}
-	}
-	*/
-	
-	// попадает ли мышь в тайл
-	public boolean mouse_in_tilelevel(Coord sc) {
-		// сначала проверим координаты
-		if (gui.mouse_pos.x >= sc.x && gui.mouse_pos.x < sc.x+tile_tex_size.x &&
-				gui.mouse_pos.y >= sc.y && gui.mouse_pos.y < sc.y+tile_tex_size.y) {
-			// теперь надо проверить попала ли в ромб
-			return true;
-		} else return false;
-	}
-	
-	// проверить тайл - являюсь ли я высшим для него
-//	public boolean check_render_tile(Coord tc, Coord mytc, int lv, int p) {
-//		int tlv = MapCache.getlevel(tc);
-//		int a,b,c,d;
-//
-//		switch (p) {
-//		case 1:
-//			a = lv-tlv;
-//			b = MapCache.getlevel(tc.add(1, 1));
-//			c = MapCache.getlevel(tc.add(1, 0));
-//			return (a<=0 && b>0 && c>0);
-//		case 2:
-//			b = lv-tlv;
-//			return b <= 0;
-//		case 3:
-//			c = lv-tlv;
-//			b = MapCache.getlevel(tc.add(1, 1));
-//			return (c<=0 && b>0);
-//		case 4:
-//			d = lv-tlv;
-//			b = MapCache.getlevel(tc.add(1, 1));
-//			c = MapCache.getlevel(tc.add(1, 0));
-//			a = MapCache.getlevel(tc.add(0, 1));
-//			return (b>0 && a>0 && c>0 && d<=0);
-//		default:
-//			return false;
-//		}
-//
-//	}
-	
-//	public void render_tile_objects(Coord tc) {
-//		for (RenderPart p : render_parts) {
-//			if (p.tc.equals(tc)) {
-//				set_render_part_color(p);
-//				p.render();
-//				Sprite.setStaticColor();
-//				RenderedObjects++;
-//			}
-//		}
-//	}
 	
 	public void drawtile_grid(Coord sc) {
         if (tileGrid_vboSize < tileGrid_Offset + 16)

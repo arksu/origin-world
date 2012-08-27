@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package a1;
 
 import a1.gui.GUI;
@@ -41,7 +42,8 @@ public class ObjExp extends ObjEffect {
 		if (life_time > MAX_LIFE_TIME) alive = false;
 	}
 
-	public void render(Coord dc) {
+	@SuppressWarnings("AccessStaticViaInstance")
+    public void render(Coord dc) {
 		double t = (float)life_time/(float)MAX_LIFE_TIME;
 		int a = FlyParam.GetAlpha(t);
 		

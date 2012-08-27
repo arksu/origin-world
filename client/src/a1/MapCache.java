@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package a1;
 
 import a1.gui.GUI_Map;
@@ -45,19 +46,19 @@ public class MapCache {
 	
 	static public void RecvMapData(Coord[] coords , int x, int y, byte[] data) {
         Grid cg = null;
-		// если какой то грид вышел за пределы видимости - удаляем его
 		for (Grid g : grids) {
 			if (g.gc.equals(new Coord(x,y))) {
                 cg = g;
 				g.set_data(data);
-				GUI_Map.needUpdateView = true;
-				break;
+                GUI_Map.needUpdateView = true;
+                break;
 			}
 		}
 
         if (cg == null) {
             cg = new Grid(new Coord(x,y), data);
 		    grids.add(cg);
+            GUI_Map.needUpdateView = true;
         }
 
 		// апдейтим минимапу
@@ -174,7 +175,7 @@ public class MapCache {
 				if (cm != 0)
 					buf.add(tile_sets[i].corner_trans[cm - 1].pick(randoom(tc)));
 			}
-			g.trans_cache[gtc.x][gtc.y] = buf.toArray(new Sprite[0]);
+			g.trans_cache[gtc.x][gtc.y] = buf.toArray(new Sprite[buf.size()]);
 		}
 		return(g.trans_cache[gtc.x][gtc.y]);
 	}

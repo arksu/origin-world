@@ -40,7 +40,7 @@ public class dlg_Hotbars extends Dialog {
     GUI_Edit ed_name;
     // alpha!
     GUI_Scrollbar sb_alpha, sb_alpha_bg;
-    GUI_Checkbox ch_move_locked;
+    GUI_Checkbox ch_move;
 
     private static String SECTION = "hotbars";
     private static int LBL_Y_OFFSET = 20;
@@ -63,11 +63,11 @@ public class dlg_Hotbars extends Dialog {
         wnd.resizeable = false;
         GUI_Label lbl;
 
-        ch_move_locked = new GUI_Checkbox(wnd);
-        ch_move_locked.caption = Lang.getTranslate(SECTION, "move_locked");
-        ch_move_locked.SetPos(10, 38);
-        ch_move_locked.SetSize(175, 21);
-        ch_move_locked.checked = true;
+        ch_move = new GUI_Checkbox(wnd);
+        ch_move.caption = Lang.getTranslate(SECTION, "move");
+        ch_move.SetPos(10, 38);
+        ch_move.SetSize(175, 21);
+        ch_move.checked = false;
 
         btn_bind_hotkeys = new GUI_Button(wnd) {
             public void DoClick() {
@@ -75,7 +75,7 @@ public class dlg_Hotbars extends Dialog {
             }
         };
         btn_bind_hotkeys.caption = Lang.getTranslate(SECTION, "bind_hotkeys");
-        btn_bind_hotkeys.SetSize(120, 25);
+        btn_bind_hotkeys.SetSize(230, 25);
         btn_bind_hotkeys.SetPos(250, 35);
 
         hlist = new GUI_StringList(wnd) {
@@ -214,7 +214,7 @@ public class dlg_Hotbars extends Dialog {
             }
         };
         ch_locked.caption = Lang.getTranslate(SECTION, "locked");
-        ch_locked.SetPos(125, 42+35);
+        ch_locked.SetPos(110, 42+35);
         ch_locked.SetSize(120, 21);
 
         ch_visible = new GUI_Checkbox(general_panel) {
@@ -431,9 +431,11 @@ public class dlg_Hotbars extends Dialog {
             }
         };
         wnd_bind.caption = Lang.getTranslate(SECTION, "bind_hotkeys");
-        wnd_bind.SetSize(470,140);
+        wnd_bind.SetSize(470,200);
         wnd_bind.SetPos(10, 140);
         wnd_bind.CenterX();
+
+        int mod_y_offset = 150;
 
         GUI_Label lbl = new GUI_Label(wnd_bind);
         lbl.caption = Lang.getTranslate(SECTION, "bind_msg");
@@ -448,7 +450,7 @@ public class dlg_Hotbars extends Dialog {
             }
         };
         lbl.caption = "SHIFT";
-        lbl.SetPos(15, 95);
+        lbl.SetPos(15, mod_y_offset);
         lbl.SetSize(100, 20);
 
         lbl = new GUI_Label(wnd_bind) {
@@ -457,7 +459,7 @@ public class dlg_Hotbars extends Dialog {
             }
         };
         lbl.caption = "CTRL";
-        lbl.SetPos(120, 95);
+        lbl.SetPos(120, mod_y_offset);
         lbl.SetSize(100, 20);
 
         lbl = new GUI_Label(wnd_bind) {
@@ -466,7 +468,7 @@ public class dlg_Hotbars extends Dialog {
             }
         };
         lbl.caption = "ALT";
-        lbl.SetPos(230, 95);
+        lbl.SetPos(230, mod_y_offset);
         lbl.SetSize(100, 20);
 
         GUI_Button btn = new GUI_Button(wnd_bind) {
@@ -490,7 +492,7 @@ public class dlg_Hotbars extends Dialog {
     }
 
     public boolean isMovingMode() {
-        return (!isBindMode() && wnd !=null && !ch_move_locked.checked);
+        return (!isBindMode() && wnd !=null && ch_move.checked);
     }
 
     @Override

@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package a1;
 
 import a1.dialogs.Dialog;
@@ -149,7 +150,7 @@ public class Main {
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_LIGHTING);
 
-		glClearColor(0.15f, 0.15f, 0.15f, 0);
+		glClearColor(0.0f, 0.0f, 0.0f, 0);
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
@@ -314,7 +315,7 @@ public class Main {
 		if (GUI_Debug.active) GUI_Debug.Update();
 		
 		// handle ALT+ENTER
-		if (Input.KeyHit(Keyboard.KEY_RETURN) && Input.isAltPressed())
+		if (Input.KeyHit(Keyboard.KEY_RETURN) && Input.isAltPressed() && Config.fullscreen_alt_enter)
 			SwitchFullscreenMode();
 
 		Hotkeys.ProcessKey();

@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package a1;
 
 import a1.utils.AppSettings;
@@ -69,7 +70,11 @@ public class Config {
 	public static String local_cache_dir = "/cache/";
 	// путь до клиента для обновления
 	public static String update_client = "/res/client.jar";
-	// юзер агент для http запросов
+    // адрес сервера с переводами
+    public static String lang_remote_host = "origin-world.com";
+    // путь к файлу переводов
+    public static String lang_path = "/lang/lang_";
+    // юзер агент для http запросов
 	public static String user_agent = "origin_client";
 	// текущий язык
 	public static String current_lang;
@@ -88,9 +93,11 @@ public class Config {
     public static boolean zoom_by_wheel;
     // зумить прямо под курсор мышки
     public static boolean zoom_over_mouse;
+    // переключать полноэкранный режим по alt+enter
+    public static boolean fullscreen_alt_enter;
 
 	public static final int PROTO_VERSION = 2;
-	public static final int CLIENT_VERSION = 62;
+	public static final int CLIENT_VERSION = 63;
 
 	public static final int ICON_SIZE = 32;
 
@@ -201,9 +208,10 @@ public class Config {
 		current_lang = AppSettings.get("language", "");
 		count_objs = AppSettings.getBool("count_objs", true);
 		hide_overlapped = AppSettings.getBool("hide_overlapped", true);
-        move_inst_left_mouse= AppSettings.getBool("move_inst_left_mouse", true);
-        zoom_by_wheel= AppSettings.getBool("zoom_by_wheel", true);
-        zoom_over_mouse= AppSettings.getBool("zoom_over_mouse", true);
+        move_inst_left_mouse = AppSettings.getBool("move_inst_left_mouse", true);
+        zoom_by_wheel = AppSettings.getBool("zoom_by_wheel", true);
+        zoom_over_mouse = AppSettings.getBool("zoom_over_mouse", true);
+        fullscreen_alt_enter = AppSettings.getBool("fullscreen_alt_enter", true);
 		user = AppSettings.get("user", "");
 		pass = AppSettings.get("pass", "");
 
@@ -231,6 +239,7 @@ public class Config {
         AppSettings.put("move_inst_left_mouse", move_inst_left_mouse);
         AppSettings.put("zoom_by_wheel", zoom_by_wheel);
         AppSettings.put("zoom_over_mouse", zoom_over_mouse);
+        AppSettings.put("fullscreen_alt_enter", fullscreen_alt_enter);
 		if (save_pass) {
 			AppSettings.put("user", user);
 			AppSettings.put("pass", pass);

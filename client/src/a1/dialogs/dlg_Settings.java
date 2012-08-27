@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package a1.dialogs;
 
 import a1.*;
@@ -30,7 +31,7 @@ public class dlg_Settings extends Dialog {
 	public GUI_Edit fps_edit;
 	public GUI_Button btn_ok;
 	public GUI_Checkbox start_fullscreen, sound_enabled, debug_engine, count_objs, hide_overlapped,
-    move_by_mouse, zoom_by_wheel, zoom_over_mouse, reduce_bg, vsync;
+    move_by_mouse, zoom_by_wheel, zoom_over_mouse, reduce_bg, vsync, fullscreen_alt_enter;
 	public GUI_Scrollbar music_vol, sound_vol;
 	public GUI_Label lbl_resolution, lbl_fps, lbl1, lbl2, lbl_music, lbl_sound;
 	public GUI_ComboBox resolution;
@@ -277,6 +278,15 @@ public class dlg_Settings extends Dialog {
         zoom_over_mouse.checked = Config.zoom_over_mouse;
         zoom_over_mouse.SetSize(200, 21);
         zoom_over_mouse.caption = Lang.getTranslate("options", "zoom_over_mouse");
+
+        fullscreen_alt_enter = new GUI_Checkbox(game_panel) {
+            public void DoClick() {
+                Config.fullscreen_alt_enter = fullscreen_alt_enter.checked;
+            }
+        };
+        fullscreen_alt_enter.checked = Config.fullscreen_alt_enter;
+        fullscreen_alt_enter.SetSize(200, 21);
+        fullscreen_alt_enter.caption = Lang.getTranslate("options", "fullscreen_alt_enter");
 		
 		//-----------------------------------------------------------------------------
 
@@ -314,6 +324,7 @@ public class dlg_Settings extends Dialog {
                 Config.move_inst_left_mouse = move_by_mouse.checked;
                 Config.zoom_by_wheel = zoom_by_wheel.checked;
                 Config.zoom_over_mouse = zoom_over_mouse.checked;
+                Config.fullscreen_alt_enter = fullscreen_alt_enter.checked;
                 Config.VSync = vsync.checked;
                 Config.ReduceInBackground = reduce_bg.checked;
 				try {
@@ -375,6 +386,7 @@ public class dlg_Settings extends Dialog {
         move_by_mouse.SetPos(10, hide_overlapped.pos.y+35);
         zoom_by_wheel.SetPos(10, move_by_mouse.pos.y+35);
         zoom_over_mouse.SetPos(10, zoom_by_wheel.pos.y+35);
+        fullscreen_alt_enter.SetPos(10, zoom_over_mouse.pos.y+35);
 		
 		btn_ok.SetPos(wnd.size.x - btn_ok.size.x - 15, wnd.size.y - btn_ok.size.y - 15);
 		wnd.Center();
