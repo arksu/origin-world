@@ -170,7 +170,7 @@ public class Packet {
     	return(Utils.unsigned_byte(blob[offset++]));
     }
 
-    public int read_int() {
+    public int read_int() { //вот здесь не сдвиг, а лучше бы сдвиг
         offset +=4;
         return(  Utils.unsigned_byte(blob[offset - 4]) +
                 (Utils.unsigned_byte(blob[offset - 3]) * 256) +
@@ -178,7 +178,7 @@ public class Packet {
                 (Utils.unsigned_byte(blob[offset - 1]) * 16777216));
     }
 
-    public int read_word() {
+    public int read_word() { //и здесь умножение
         offset +=2;
         return(  Utils.unsigned_byte(blob[offset - 2]) +
                 (Utils.unsigned_byte(blob[offset - 1]) * 256));
