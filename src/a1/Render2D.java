@@ -14,10 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package a1;
 
 
 import a1.utils.BitmapFont;
+import a1.utils.Rect;
 import a1.utils.Resource;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
@@ -47,8 +49,8 @@ public class Render2D {
 	public static final int Align_Stretch   = Align_HStretch + Align_VStretch;
 	public static final int Align_Default   = Align_Left + Align_Top;
 	
-	private static Stack<IntCoord> scissors = new Stack<IntCoord>();
-	private static IntCoord current_scissor = null;
+	private static Stack<Rect> scissors = new Stack<Rect>();
+	private static Rect current_scissor = null;
 	private static boolean enabled2d = false;
 	private static Color col = Color.white;
 	private static Map<String, BitmapFont> fonts = new HashMap<String, BitmapFont>();
@@ -72,10 +74,10 @@ public class Render2D {
 		    throw(new GLException(error));
 	}
 
-	static public void PushScissor(IntCoord s) {
+	static public void PushScissor(Rect s) {
 		if (current_scissor == null)
 			GL11.glEnable(GL11.GL_SCISSOR_TEST);
-		IntCoord NewRect;
+		Rect NewRect;
 		if (current_scissor == null)
 			NewRect = CompareScissorRects(s, s);
 		else
@@ -96,8 +98,8 @@ public class Render2D {
 			GL11.glDisable(GL11.GL_SCISSOR_TEST);
 	}
 	
-	static public IntCoord CompareScissorRects(IntCoord new_rect, IntCoord old_rect) {
-		IntCoord result = new_rect;
+	static public Rect CompareScissorRects(Rect new_rect, Rect old_rect) {
+		Rect result = new_rect;
 		if (result.x < old_rect.x) result.x = old_rect.x;
 		if (result.y < old_rect.y) result.y = old_rect.y;
 		if (result.Right() > old_rect.Right()) result.SetRight(old_rect.Right());

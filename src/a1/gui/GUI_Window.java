@@ -19,8 +19,8 @@ package a1.gui;
 
 import a1.Coord;
 import a1.Input;
-import a1.IntCoord;
 import a1.Render2D;
+import a1.utils.Rect;
 import org.newdawn.slick.Color;
 
 import static a1.gui.Skin.StateHighlight;
@@ -188,19 +188,19 @@ public class GUI_Window extends GUI_Control {
 	}
 	
 	protected boolean mouse_in_caption() {
-		IntCoord rect = new IntCoord(abs_pos, new Coord(size.x,CAPTION_HEIGHT));
+		Rect rect = new Rect(abs_pos, new Coord(size.x,CAPTION_HEIGHT));
 		return (rect.PointInRect(gui.mouse_pos) && MouseInMe());
 	}
 	
 	protected boolean mouse_in_right_resize() {
 		Coord sz = getSkin().GetElementSize("window_resize_right");
-		IntCoord rect = new IntCoord(abs_pos.x+size.x-sz.x, abs_pos.y+size.y-sz.y, sz);
+		Rect rect = new Rect(abs_pos.x+size.x-sz.x, abs_pos.y+size.y-sz.y, sz);
 		return (rect.PointInRect(gui.mouse_pos) && MouseInMe());
 	}
 	
 	protected boolean mouse_in_left_resize() {
 		Coord sz = getSkin().GetElementSize("window_resize_left");
-		IntCoord rect = new IntCoord(abs_pos.x, abs_pos.y+size.y-sz.y, sz);
+		Rect rect = new Rect(abs_pos.x, abs_pos.y+size.y-sz.y, sz);
 		return (rect.PointInRect(gui.mouse_pos) && MouseInMe());
 	}
 	

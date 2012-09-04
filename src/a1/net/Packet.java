@@ -15,8 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package a1;
+package a1.net;
 
+import a1.Config;
+import a1.MapCache;
 import a1.utils.Utils;
 import com.ericsson.otp.erlang.OtpErlangDecodeException;
 import com.ericsson.otp.erlang.OtpErlangObject;
@@ -173,15 +175,15 @@ public class Packet {
     public int read_int() {
         offset +=4;
         return(  Utils.unsigned_byte(blob[offset - 4]) +
-                (Utils.unsigned_byte(blob[offset - 3]) * 256) +
-                (Utils.unsigned_byte(blob[offset - 2]) * 65536) +
-                (Utils.unsigned_byte(blob[offset - 1]) * 16777216));
+                (Utils.unsigned_byte(blob[offset - 3]) << 8) +
+                (Utils.unsigned_byte(blob[offset - 2]) << 16) +
+                (Utils.unsigned_byte(blob[offset - 1]) << 24));
     }
 
     public int read_word() {
         offset +=2;
         return(  Utils.unsigned_byte(blob[offset - 2]) +
-                (Utils.unsigned_byte(blob[offset - 1]) * 256));
+                (Utils.unsigned_byte(blob[offset - 1]) << 8));
     }
 
     public String read_string_ascii() {

@@ -19,9 +19,9 @@ package a1.obj;
 
 import a1.Lang;
 import a1.Log;
-import a1.Packet;
 import a1.gui.GUI;
 import a1.gui.GUI_Window;
+import a1.net.Packet;
 
 import java.util.HashMap;
 import java.util.Map;

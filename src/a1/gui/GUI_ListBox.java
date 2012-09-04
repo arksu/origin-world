@@ -14,12 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package a1.gui;
 
 import a1.Coord;
 import a1.Input;
-import a1.IntCoord;
 import a1.Render2D;
+import a1.utils.Rect;
 
 public class GUI_ListBox extends GUI_ScrollPage {
 	protected int SelectedItem = -1;
@@ -39,20 +40,20 @@ public class GUI_ListBox extends GUI_ScrollPage {
 			getSkin().Draw(skin_element, abs_pos.x, abs_pos.y, size.x, size.y);
 		}
 		
-		IntCoord wr = WorkRect();
+		Rect wr = WorkRect();
 		// координаты текущей записи относительно контрола
 		int ax = abs_pos.x+ClientRect.x-wr.x;
 		int ay = abs_pos.y+ClientRect.y-wr.y;
 		
 		// для отсечки записей находящихся на границе контрола - ставим доп. скиссор
-		Render2D.PushScissor(new IntCoord(abs_pos.x+ClientRect.x, abs_pos.y+ClientRect.y, wr.w, wr.h));
+		Render2D.PushScissor(new Rect(abs_pos.x+ClientRect.x, abs_pos.y+ClientRect.y, wr.w, wr.h));
 		
 		int h;
 		for (int i=0; i<GetCount(); i++) {
 			h = GetItemHeight(i);
 			// если запись всяко за границами рисуемой области - пропускаем
 			if ((ay+h >= abs_pos.y+ClientRect.y) && (ay < abs_pos.y+ClientRect.y+wr.h)) {
-                Render2D.PushScissor(new IntCoord(ax, ay, wr.w , h));
+                Render2D.PushScissor(new Rect(ax, ay, wr.w , h));
                 DrawItemBg(i, ax, ay, wr.w, h);
                 DoDrawItem(i, ax, ay, wr.w, h);
 
@@ -89,7 +90,7 @@ public class GUI_ListBox extends GUI_ScrollPage {
             }
         }
 		
-		IntCoord wr = WorkRect();
+		Rect wr = WorkRect();
 		// координаты текущей записи относительно контрола
 		int ax = abs_pos.x+ClientRect.x-wr.x;
 		int ay = abs_pos.y+ClientRect.y-wr.y;
@@ -188,7 +189,7 @@ public class GUI_ListBox extends GUI_ScrollPage {
 		int result = -1;
 		if (!MouseInMe()) return result;
 		
-		IntCoord wr = WorkRect();
+		Rect wr = WorkRect();
 		// координаты текущей записи относительно контрола
 		int ax = abs_pos.x+ClientRect.x-wr.x;
 		int ay = abs_pos.y+ClientRect.y-wr.y;

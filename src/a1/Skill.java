@@ -17,6 +17,8 @@
 
 package a1;
 
+import a1.net.Packet;
+
 public class Skill {
     public String name;
     public int level;

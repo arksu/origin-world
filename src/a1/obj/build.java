@@ -18,10 +18,10 @@
 package a1.obj;
 
 import a1.Lang;
-import a1.Packet;
 import a1.gui.GUI_BuildSlot;
 import a1.gui.GUI_Button;
 import a1.net.NetGame;
+import a1.net.Packet;
 import com.ericsson.otp.erlang.OtpErlangAtom;
 import com.ericsson.otp.erlang.OtpErlangInt;
 import com.ericsson.otp.erlang.OtpErlangObject;

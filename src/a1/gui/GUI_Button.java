@@ -19,9 +19,9 @@ package a1.gui;
 
 import a1.Input;
 import a1.Lang;
-import a1.Packet;
 import a1.Render2D;
 import a1.net.NetGame;
+import a1.net.Packet;
 import org.newdawn.slick.Color;
 
 import static a1.gui.Skin.*;

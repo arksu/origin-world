@@ -14,15 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package a1.dialogs;
 
-import a1.*;
+import a1.Config;
+import a1.Lang;
+import a1.Main;
 import a1.gui.GUI;
 import a1.gui.GUI_Button;
 import a1.gui.GUI_Panel;
 import a1.gui.GUI_Panel.RenderMode;
 import a1.gui.GUI_Window;
 import a1.net.NetLogin;
+import a1.net.Packet;
 import org.newdawn.slick.Color;
 
 import java.util.ArrayList;

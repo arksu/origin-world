@@ -14,12 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package a1.dialogs;
 
-import a1.*;
+import a1.Lang;
+import a1.Log;
+import a1.Render2D;
 import a1.gui.GUI;
 import a1.gui.GUI_Label;
 import a1.gui.GUI_Progressbar;
+import a1.net.Packet;
 import org.newdawn.slick.Color;
 //import a1.gui.GUI_Texture;
 

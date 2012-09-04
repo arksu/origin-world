@@ -19,6 +19,7 @@ package a1;
 
 
 import a1.gui.GUI_Map;
+import a1.net.Packet;
 
 import java.util.HashMap;
 import java.util.Map;

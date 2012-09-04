@@ -14,12 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package a1.gui;
 
 import a1.Coord;
 import a1.Input;
-import a1.IntCoord;
 import a1.Render2D;
+import a1.utils.Rect;
 import org.newdawn.slick.Color;
 
 import java.util.ArrayList;
@@ -142,7 +143,7 @@ public class GUI_ComboBox extends GUI_Control {
 		getSkin().Draw(skin_element, abs_pos.x, abs_pos.y, size.x, size.y);
 		
 		// ставим скиссор до кнопки
-		Render2D.PushScissor(new IntCoord(abs_pos.x  +  ClientRect.x, abs_pos.y + ClientRect.y,
+		Render2D.PushScissor(new Rect(abs_pos.x  +  ClientRect.x, abs_pos.y + ClientRect.y,
 	                              ClientRect.w - drop_button.Width(), ClientRect.h));
 	
 		// выводим текст

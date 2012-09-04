@@ -18,6 +18,7 @@
 package a1.gui;
 
 import a1.*;
+import a1.utils.Rect;
 import a1.utils.Resource;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.input.Keyboard;

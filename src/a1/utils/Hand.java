@@ -18,9 +18,9 @@
 package a1.utils;
 
 import a1.Coord;
-import a1.Packet;
 import a1.gui.GUI;
 import a1.gui.GUI_Image;
+import a1.net.Packet;
 
 /**
  * то что держим в руке

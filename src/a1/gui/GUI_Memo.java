@@ -14,11 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package a1.gui;
 
 import a1.Coord;
-import a1.IntCoord;
 import a1.Render2D;
+import a1.utils.Rect;
 import a1.utils.WordWrap;
 import org.newdawn.slick.Color;
 
@@ -71,10 +72,10 @@ public class GUI_Memo extends GUI_ScrollPage {
 	
 	public void DoRender() {
 		DrawBackground();
-		IntCoord wr = WorkRect();
+		Rect wr = WorkRect();
 		Coord awr = AbsWorkCoord();
 		int ay = awr.y;
-		Render2D.PushScissor(new IntCoord(abs_pos.x+ClientRect.x, abs_pos.y+ClientRect.y, wr.w, wr.h));
+		Render2D.PushScissor(new Rect(abs_pos.x+ClientRect.x, abs_pos.y+ClientRect.y, wr.w, wr.h));
 		for (int i = 0; i < render_lines.size(); i++) {
 			DrawMemoLine(awr.x, ay, wr.w, wr.h, i);
 			ay += Render2D.GetTextHeight(render_lines.get(i).font, render_lines.get(i).text);
@@ -106,7 +107,7 @@ public class GUI_Memo extends GUI_ScrollPage {
 	}
 	
 	public void DoSetSize() {
-		ClientRect = new IntCoord(3, 3, size.x-6, size.y-6);
+		ClientRect = new Rect(3, 3, size.x-6, size.y-6);
 		UpdateLines();
 		super.DoSetSize();
 	}

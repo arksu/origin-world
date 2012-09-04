@@ -14,9 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package a1.gui;
 
-import a1.*;
+import a1.Coord;
+import a1.Input;
+import a1.Log;
+import a1.Render2D;
+import a1.utils.Rect;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
@@ -316,7 +321,7 @@ public class GUI_Edit extends GUI_Control implements ClipboardOwner {
 		}
 		getSkin().Draw(skin_element, abs_pos.x, abs_pos.y, size.x, size.y, state);
 		
-		Render2D.PushScissor(new IntCoord(abs_pos.x + OFFSET, abs_pos.y+OFFSET, size.x - OFFSET, size.y-OFFSET));
+		Render2D.PushScissor(new Rect(abs_pos.x + OFFSET, abs_pos.y+OFFSET, size.x - OFFSET, size.y-OFFSET));
 		int left = Render2D.GetTextWidth(font_name, getVisualText().substring(0, getSelectionStart()));
 		int SelectionWidth = Render2D.GetTextWidth(font_name, getVisualText().substring(
 				getSelectionStart(), getSelectionFinish()));

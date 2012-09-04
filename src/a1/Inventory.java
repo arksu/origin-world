@@ -18,6 +18,7 @@
 package a1;
 
 import a1.gui.GUI_Inventory;
+import a1.net.Packet;
 
 import java.util.ArrayList;
 import java.util.HashMap;

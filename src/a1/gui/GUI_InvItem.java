@@ -18,7 +18,9 @@
 package a1.gui;
 
 import a1.*;
+import a1.net.Packet;
 import a1.utils.InventoryClick;
+import a1.utils.Rect;
 import org.newdawn.slick.Color;
 
 import java.util.ArrayList;

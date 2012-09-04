@@ -18,10 +18,10 @@
 package a1.gui;
 
 import a1.Coord;
-import a1.IntCoord;
 import a1.Main;
 import a1.gui.utils.DragInfo;
 import a1.net.NetGame;
+import a1.utils.Rect;
 
 import static a1.utils.Utils.max;
 
@@ -41,7 +41,7 @@ public class GUI_Control {
 	// абсолютные координаты на экране
 	protected Coord abs_pos = Coord.z;
 	// рабочая область
-	protected IntCoord ClientRect = new IntCoord(0, 0, 0, 0);
+	protected Rect ClientRect = new Rect(0, 0, 0, 0);
 	// рендерить ли детей. если нет - то рендерим в ручном режиме.
 	public boolean render_childs = true;
 	// уничтожен ли контрол. елси истина - любое использование контрола не допускается
@@ -508,7 +508,7 @@ public class GUI_Control {
 	
 	// смена размера
 	public void DoSetSize() {
-		ClientRect = new IntCoord(3, 3, size.x-6, size.y-6);
+		ClientRect = new Rect(3, 3, size.x-6, size.y-6);
 	}
 
 	// завершить перетаскивание

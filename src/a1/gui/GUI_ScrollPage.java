@@ -14,10 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package a1.gui;
 
 import a1.Coord;
-import a1.IntCoord;
+import a1.utils.Rect;
 
 public class GUI_ScrollPage extends GUI_Control {
 	boolean HaveVerticalScrollbar;
@@ -75,7 +76,7 @@ public class GUI_ScrollPage extends GUI_Control {
 		return result;
 	}
 
-	protected IntCoord WorkRect() { // HaveVerticalScrollbar
+	protected Rect WorkRect() { // HaveVerticalScrollbar
 		int x, y, w, h;
 		if (HaveVerticalScrollbar) {
 			y = FVerticalScrollbar.Pos;
@@ -105,7 +106,7 @@ public class GUI_ScrollPage extends GUI_Control {
 				w = ClientRect.w;
 		}
 
-		return new IntCoord(x, y, w, h);
+		return new Rect(x, y, w, h);
 	}
 
 	protected Coord AbsWorkCoord() {

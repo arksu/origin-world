@@ -23,6 +23,7 @@ import a1.gui.GUI;
 import a1.gui.GUI_Inventory;
 import a1.gui.GUI_Window;
 import a1.net.NetGame;
+import a1.net.Packet;
 import a1.utils.Hand;
 import a1.utils.InventoryClick;
 import a1.utils.Utils;

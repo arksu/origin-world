@@ -15,7 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package a1;
+package a1.utils;
+
+import a1.Coord;
 
 public class Rect {
 	public int x;
@@ -36,6 +38,20 @@ public class Rect {
 		this.w = sz.x;
 		this.h = sz.y;
 	}
+
+    public Rect(int x, int y, Coord size) {
+        this.x = x;
+        this.y = y;
+        this.w = size.x;
+        this.h = size.y;
+    }
+
+    public Rect(Rect r ) {
+        this.x = r.x;
+        this.y = r.y;
+        this.w = r.w;
+        this.h = r.h;
+    }
 	
 	public Rect Union(Coord ul, Coord sz) {
 		int nx = Math.min(x, ul.x);
@@ -74,8 +90,30 @@ public class Rect {
 				 ((ry > y)  && (ry <= y+h)) || ((ry+rh > y) && (ry+rh <= y+h)))		
 		);
 	}
+
 	
 	public String toString() {
 		return "x="+x+" y="+y+" w="+w+" h="+h;
 	}
+
+    public boolean PointInRect(Coord p) {
+        return (p.x >= x && p.x < x+w && p.y >= y && p.y < y+h);
+    }
+
+    public int Right() {
+        return x+w;
+    }
+
+    public int Bottom() {
+        return y+h;
+    }
+
+    public void SetRight(int a) {
+        w = a - x;
+    }
+
+    public void SetBottom(int a) {
+        h = a - y;
+    }
+
 }

@@ -17,7 +17,6 @@
 
 package a1.dialogs;
 
-import a1.DialogFactory;
 import a1.Hotbar;
 import a1.Input;
 import a1.Lang;

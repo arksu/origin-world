@@ -18,10 +18,10 @@
 package a1.gui;
 
 import a1.Coord;
-import a1.IntCoord;
 import a1.Log;
 import a1.Sprite;
 import a1.utils.Align;
+import a1.utils.Rect;
 import a1.utils.Resource;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.opengl.Texture;
@@ -118,19 +118,19 @@ public class Skin {
 		public int height;
 		String texture_name;
 		Sprite spr = null;
-		IntCoord offset;
+		Rect offset;
 		// последние размеры вывода элемнта на экран
 		int CurrentSizeH;
 		int CurrentSizeW;
 		// все кусочки из которых состоит элемент
 		List<SkinSubElement> childs = new ArrayList<SkinSubElement>();
 
-		public SkinElement(Skin skin, String name, String tex_name, int w, int h, IntCoord offset) {
+		public SkinElement(Skin skin, String name, String tex_name, int w, int h, Rect offset) {
 			skin.AddElement(name, this);
 			this.texture_name = tex_name;
 			this.width = w;
 			this.height = h;
-			this.offset = new IntCoord(offset);
+			this.offset = new Rect(offset);
 			CurrentSizeH = 0;
 			CurrentSizeW = 0;
 		}
@@ -140,7 +140,7 @@ public class Skin {
 			this.texture_name = tex_name;
 			this.width = w;
 			this.height = h;
-			this.offset = new IntCoord(0,0,0,0);
+			this.offset = new Rect(0,0,0,0);
 			CurrentSizeH = 0;
 			CurrentSizeW = 0;
 		}
@@ -181,9 +181,9 @@ public class Skin {
 	// тайлом или стретчем
 	class SkinSubElement {
 		// область внутри элемента для вывода
-		public IntCoord Offset;
+		public Rect Offset;
 		// координаты последнего вывода кусочка (нужно для кеширования)
-		public IntCoord mCoord;
+		public Rect mCoord;
 		// выравнивание субэлемента (как и куда выводится кусочек)
 		public byte align;
 		// состояния
@@ -192,24 +192,24 @@ public class Skin {
 		public boolean TileH;
 		public boolean TileV;
 
-		public void AddState(int state, IntCoord texture_rect, Color col) {
+		public void AddState(int state, Rect texture_rect, Color col) {
 			states.add(new SkinSubElementState(state, texture_rect, col));
 		}
 		
-		public void AddState(int state, IntCoord texture_rect) {
+		public void AddState(int state, Rect texture_rect) {
 			states.add(new SkinSubElementState(state, texture_rect, Color.white));
 		}
 
-		public SkinSubElement(SkinElement el, IntCoord offset, int align, boolean TileH, boolean TileV) {
-			this.Offset = new IntCoord(offset);
+		public SkinSubElement(SkinElement el, Rect offset, int align, boolean TileH, boolean TileV) {
+			this.Offset = new Rect(offset);
 			this.align = (byte) align;
 			this.TileH = TileH;
 			this.TileV = TileV;
 			el.AddSubElement(this);
 		}
 		
-		public SkinSubElement(SkinElement el, IntCoord offset, int align) {
-			this.Offset = new IntCoord(offset);
+		public SkinSubElement(SkinElement el, Rect offset, int align) {
+			this.Offset = new Rect(offset);
 			this.align = (byte) align;
 			this.TileH = false;
 			this.TileV = false;
@@ -218,7 +218,7 @@ public class Skin {
 		
 		// обновить координаты на экране с учетом привязок
 		public void UpdateSize(Coord orig, Coord newc) {
-			mCoord = new IntCoord(Offset);
+			mCoord = new Rect(Offset);
 
 			// ===== ГОРИЗОНТАЛЬНОЕ выравнивание =====
 			// проверяем должен ли вообще рисоватся элемент?
@@ -396,25 +396,25 @@ public class Skin {
 			int x, int x1, int x2, int x3, 
 			int y, int y1, int y2, int y3) {
 		SkinSubElement sub;
-		sub = new SkinSubElement(el, new IntCoord(0, 0, w, h),  Align_Center );
-		if (x != -1 && y != -1) sub.AddState(StateNormal,    new IntCoord(x, y, w, h));
-		if (x1 != -1 && y1 != -1) sub.AddState(StateHighlight, new IntCoord(x1, y1, w, h));
-		if (x2 != -1 && y2 != -1) sub.AddState(StatePressed,   new IntCoord(x2, y2, w, h));
-		if (x3 != -1 && y3 != -1) sub.AddState(StateDisable,   new IntCoord(x3, y3, w, h));		
+		sub = new SkinSubElement(el, new Rect(0, 0, w, h),  Align_Center );
+		if (x != -1 && y != -1) sub.AddState(StateNormal,    new Rect(x, y, w, h));
+		if (x1 != -1 && y1 != -1) sub.AddState(StateHighlight, new Rect(x1, y1, w, h));
+		if (x2 != -1 && y2 != -1) sub.AddState(StatePressed,   new Rect(x2, y2, w, h));
+		if (x3 != -1 && y3 != -1) sub.AddState(StateDisable,   new Rect(x3, y3, w, h));		
 	}
 	
 	protected void AddStatesCenter(SkinElement el, int h, int w,
 			int x, int y) {
 		SkinSubElement sub;
-		sub = new SkinSubElement(el, new IntCoord(0, 0, w, h),  Align_Center );
-		if (x != -1 && y != -1) sub.AddState(StateNormal,    new IntCoord(x, y, w, h));
+		sub = new SkinSubElement(el, new Rect(0, 0, w, h),  Align_Center );
+		if (x != -1 && y != -1) sub.AddState(StateNormal,    new Rect(x, y, w, h));
 	}
 	
 	protected void AddStatesStretch(SkinElement el, int h, int w,
 			int x, int y) {
 		SkinSubElement sub;
-		sub = new SkinSubElement(el, new IntCoord(0, 0, w, h),  Align_Stretch );
-		if (x != -1 && y != -1) sub.AddState(StateNormal,    new IntCoord(x, y, w, h));
+		sub = new SkinSubElement(el, new Rect(0, 0, w, h),  Align_Stretch );
+		if (x != -1 && y != -1) sub.AddState(StateNormal,    new Rect(x, y, w, h));
 	}
 	
 	protected void AddStates(SkinElement el, 
@@ -455,123 +455,123 @@ public class Skin {
 		SkinSubElement sub;
 		if (h1 > 0) {
 			if (w1 > 0) {
-				sub = new SkinSubElement(el, new IntCoord(0, 0, w1, h1),  Align_Left + Align_Top );
-				if (x != -1 && y != -1) sub.AddState(StateNormal,    new IntCoord(x, y, w1, h1));
-				if (x1 != -1 && y1 != -1) sub.AddState(StateHighlight, new IntCoord(x1, y1, w1, h1));
-				if (x2 != -1 && y2 != -1) sub.AddState(StatePressed,   new IntCoord(x2, y2, w1, h1));
-				if (x3 != -1 && y3 != -1) sub.AddState(StateDisable,   new IntCoord(x3, y3, w1, h1));
-				if (x4 != -1 && y4 != -1) sub.AddState(StateNormal_Checked,   new IntCoord(x4, y4, w1, h1));
-				if (x5 != -1 && y5 != -1) sub.AddState(StateHighlight_Checked,   new IntCoord(x5, y5, w1, h1));
-				if (x6 != -1 && y6 != -1) sub.AddState(StatePressed_Checked,   new IntCoord(x6, y6, w1, h1));
-				if (x7 != -1 && y7 != -1) sub.AddState(StateDisable_Checked,   new IntCoord(x7, y7, w1, h1));
+				sub = new SkinSubElement(el, new Rect(0, 0, w1, h1),  Align_Left + Align_Top );
+				if (x != -1 && y != -1) sub.AddState(StateNormal,    new Rect(x, y, w1, h1));
+				if (x1 != -1 && y1 != -1) sub.AddState(StateHighlight, new Rect(x1, y1, w1, h1));
+				if (x2 != -1 && y2 != -1) sub.AddState(StatePressed,   new Rect(x2, y2, w1, h1));
+				if (x3 != -1 && y3 != -1) sub.AddState(StateDisable,   new Rect(x3, y3, w1, h1));
+				if (x4 != -1 && y4 != -1) sub.AddState(StateNormal_Checked,   new Rect(x4, y4, w1, h1));
+				if (x5 != -1 && y5 != -1) sub.AddState(StateHighlight_Checked,   new Rect(x5, y5, w1, h1));
+				if (x6 != -1 && y6 != -1) sub.AddState(StatePressed_Checked,   new Rect(x6, y6, w1, h1));
+				if (x7 != -1 && y7 != -1) sub.AddState(StateDisable_Checked,   new Rect(x7, y7, w1, h1));
 			}
 		
 			if (w2 > 0) {
-				sub = new SkinSubElement(el, new IntCoord(w1, 0, w2, h1),  Align_HStretch + Align_Top );
-				if (x != -1 && y != -1) sub.AddState(StateNormal,    new IntCoord(x+w1+w_insert1, y, w2, h1));
-				if (x1 != -1 && y1 != -1) sub.AddState(StateHighlight, new IntCoord(x1+w1+w_insert1, y1, w2, h1));
-				if (x2 != -1 && y2 != -1) sub.AddState(StatePressed,   new IntCoord(x2+w1+w_insert1, y2, w2, h1));
-				if (x3 != -1 && y3 != -1) sub.AddState(StateDisable,   new IntCoord(x3+w1+w_insert1, y3, w2, h1));
-				if (x4 != -1 && y4 != -1) sub.AddState(StateNormal_Checked,   new IntCoord(x4+w1+w_insert1, y4, w2, h1));
-				if (x5 != -1 && y5 != -1) sub.AddState(StateHighlight_Checked,   new IntCoord(x5+w1+w_insert1, y5, w2, h1));
-				if (x6 != -1 && y6 != -1) sub.AddState(StatePressed_Checked,   new IntCoord(x6+w1+w_insert1, y6, w2, h1));
-				if (x7 != -1 && y7 != -1) sub.AddState(StateDisable_Checked,   new IntCoord(x7+w1+w_insert1, y7, w2, h1));
+				sub = new SkinSubElement(el, new Rect(w1, 0, w2, h1),  Align_HStretch + Align_Top );
+				if (x != -1 && y != -1) sub.AddState(StateNormal,    new Rect(x+w1+w_insert1, y, w2, h1));
+				if (x1 != -1 && y1 != -1) sub.AddState(StateHighlight, new Rect(x1+w1+w_insert1, y1, w2, h1));
+				if (x2 != -1 && y2 != -1) sub.AddState(StatePressed,   new Rect(x2+w1+w_insert1, y2, w2, h1));
+				if (x3 != -1 && y3 != -1) sub.AddState(StateDisable,   new Rect(x3+w1+w_insert1, y3, w2, h1));
+				if (x4 != -1 && y4 != -1) sub.AddState(StateNormal_Checked,   new Rect(x4+w1+w_insert1, y4, w2, h1));
+				if (x5 != -1 && y5 != -1) sub.AddState(StateHighlight_Checked,   new Rect(x5+w1+w_insert1, y5, w2, h1));
+				if (x6 != -1 && y6 != -1) sub.AddState(StatePressed_Checked,   new Rect(x6+w1+w_insert1, y6, w2, h1));
+				if (x7 != -1 && y7 != -1) sub.AddState(StateDisable_Checked,   new Rect(x7+w1+w_insert1, y7, w2, h1));
 			}
 	
 			if (w3 > 0) {
-				sub = new SkinSubElement(el, new IntCoord(w1+w2, 0, w3, h1),  Align_Right + Align_Top );
-				if (x != -1 && y != -1) sub.AddState(StateNormal,    new IntCoord(x+w1+w2+w_insert1+w_insert2, y, w3, h1));
-				if (x1 != -1 && y1 != -1) sub.AddState(StateHighlight, new IntCoord(x1+w1+w2+w_insert1+w_insert2, y1, w3, h1));
-				if (x2 != -1 && y2 != -1) sub.AddState(StatePressed,   new IntCoord(x2+w1+w2+w_insert1+w_insert2, y2, w3, h1));
-				if (x3 != -1 && y3 != -1) sub.AddState(StateDisable,   new IntCoord(x3+w1+w2+w_insert1+w_insert2, y3, w3, h1));
-				if (x4 != -1 && y4 != -1) sub.AddState(StateNormal_Checked,   new IntCoord(x4+w1+w2+w_insert1+w_insert2, y4, w3, h1));
-				if (x5 != -1 && y5 != -1) sub.AddState(StateHighlight_Checked,   new IntCoord(x5+w1+w2+w_insert1+w_insert2, y5, w3, h1));
-				if (x6 != -1 && y6 != -1) sub.AddState(StatePressed_Checked,   new IntCoord(x6+w1+w2+w_insert1+w_insert2, y6, w3, h1));
-				if (x7 != -1 && y7 != -1) sub.AddState(StateDisable_Checked,   new IntCoord(x7+w1+w2+w_insert1+w_insert2, y7, w3, h1));
+				sub = new SkinSubElement(el, new Rect(w1+w2, 0, w3, h1),  Align_Right + Align_Top );
+				if (x != -1 && y != -1) sub.AddState(StateNormal,    new Rect(x+w1+w2+w_insert1+w_insert2, y, w3, h1));
+				if (x1 != -1 && y1 != -1) sub.AddState(StateHighlight, new Rect(x1+w1+w2+w_insert1+w_insert2, y1, w3, h1));
+				if (x2 != -1 && y2 != -1) sub.AddState(StatePressed,   new Rect(x2+w1+w2+w_insert1+w_insert2, y2, w3, h1));
+				if (x3 != -1 && y3 != -1) sub.AddState(StateDisable,   new Rect(x3+w1+w2+w_insert1+w_insert2, y3, w3, h1));
+				if (x4 != -1 && y4 != -1) sub.AddState(StateNormal_Checked,   new Rect(x4+w1+w2+w_insert1+w_insert2, y4, w3, h1));
+				if (x5 != -1 && y5 != -1) sub.AddState(StateHighlight_Checked,   new Rect(x5+w1+w2+w_insert1+w_insert2, y5, w3, h1));
+				if (x6 != -1 && y6 != -1) sub.AddState(StatePressed_Checked,   new Rect(x6+w1+w2+w_insert1+w_insert2, y6, w3, h1));
+				if (x7 != -1 && y7 != -1) sub.AddState(StateDisable_Checked,   new Rect(x7+w1+w2+w_insert1+w_insert2, y7, w3, h1));
 			}
 		}
 		//------------------------------------------------------------------------------------
 		if (h2 > 0) {
 			if (w1 > 0) {
-				sub = new SkinSubElement(el, new IntCoord(0, h1, w1, h2),  Align_Left + Align_VStretch );
-				if (x != -1 && y != -1) sub.AddState(StateNormal,    new IntCoord(x, y+h1+h_insert1, w1, h2));
-				if (x1 != -1 && y1 != -1) sub.AddState(StateHighlight, new IntCoord(x1, y1+h1+h_insert1, w1, h2));
-				if (x2 != -1 && y2 != -1) sub.AddState(StatePressed,   new IntCoord(x2, y2+h1+h_insert1, w1, h2));
-				if (x3 != -1 && y3 != -1) sub.AddState(StateDisable,   new IntCoord(x3, y3+h1+h_insert1, w1, h2));
-				if (x4 != -1 && y4 != -1) sub.AddState(StateNormal_Checked,   new IntCoord(x4, y4+h1+h_insert1, w1, h2));
-				if (x5 != -1 && y5 != -1) sub.AddState(StateHighlight_Checked,   new IntCoord(x5, y5+h1+h_insert1, w1, h2));
-				if (x6 != -1 && y6 != -1) sub.AddState(StatePressed_Checked,   new IntCoord(x6, y6+h1+h_insert1, w1, h2));
-				if (x7 != -1 && y7 != -1) sub.AddState(StateDisable_Checked,   new IntCoord(x7, y7+h1+h_insert1, w1, h2));
+				sub = new SkinSubElement(el, new Rect(0, h1, w1, h2),  Align_Left + Align_VStretch );
+				if (x != -1 && y != -1) sub.AddState(StateNormal,    new Rect(x, y+h1+h_insert1, w1, h2));
+				if (x1 != -1 && y1 != -1) sub.AddState(StateHighlight, new Rect(x1, y1+h1+h_insert1, w1, h2));
+				if (x2 != -1 && y2 != -1) sub.AddState(StatePressed,   new Rect(x2, y2+h1+h_insert1, w1, h2));
+				if (x3 != -1 && y3 != -1) sub.AddState(StateDisable,   new Rect(x3, y3+h1+h_insert1, w1, h2));
+				if (x4 != -1 && y4 != -1) sub.AddState(StateNormal_Checked,   new Rect(x4, y4+h1+h_insert1, w1, h2));
+				if (x5 != -1 && y5 != -1) sub.AddState(StateHighlight_Checked,   new Rect(x5, y5+h1+h_insert1, w1, h2));
+				if (x6 != -1 && y6 != -1) sub.AddState(StatePressed_Checked,   new Rect(x6, y6+h1+h_insert1, w1, h2));
+				if (x7 != -1 && y7 != -1) sub.AddState(StateDisable_Checked,   new Rect(x7, y7+h1+h_insert1, w1, h2));
 			}
 		
 			if (w2 > 0) {
-				sub = new SkinSubElement(el, new IntCoord(w1, h1, w2, h2),  Align_HStretch + Align_VStretch );
-				if (x != -1 && y != -1) sub.AddState(StateNormal,    new IntCoord(x+w1+w_insert1, y+h1+h_insert1, w2, h2));
-				if (x1 != -1 && y1 != -1) sub.AddState(StateHighlight, new IntCoord(x1+w1+w_insert1, y1+h1+h_insert1, w2, h2));
-				if (x2 != -1 && y2 != -1) sub.AddState(StatePressed,   new IntCoord(x2+w1+w_insert1, y2+h1+h_insert1, w2, h2));
-				if (x3 != -1 && y3 != -1) sub.AddState(StateDisable,   new IntCoord(x3+w1+w_insert1, y3+h1+h_insert1, w2, h2));
-				if (x4 != -1 && y4 != -1) sub.AddState(StateNormal_Checked,   new IntCoord(x4+w1+w_insert1, y4+h1+h_insert1, w2, h2));
-				if (x5 != -1 && y5 != -1) sub.AddState(StateHighlight_Checked,   new IntCoord(x5+w1+w_insert1, y5+h1+h_insert1, w2, h2));
-				if (x6 != -1 && y6 != -1) sub.AddState(StatePressed_Checked,   new IntCoord(x6+w1+w_insert1, y6+h1+h_insert1, w2, h2));
-				if (x7 != -1 && y7 != -1) sub.AddState(StateDisable_Checked,   new IntCoord(x7+w1+w_insert1, y7+h1+h_insert1, w2, h2));
+				sub = new SkinSubElement(el, new Rect(w1, h1, w2, h2),  Align_HStretch + Align_VStretch );
+				if (x != -1 && y != -1) sub.AddState(StateNormal,    new Rect(x+w1+w_insert1, y+h1+h_insert1, w2, h2));
+				if (x1 != -1 && y1 != -1) sub.AddState(StateHighlight, new Rect(x1+w1+w_insert1, y1+h1+h_insert1, w2, h2));
+				if (x2 != -1 && y2 != -1) sub.AddState(StatePressed,   new Rect(x2+w1+w_insert1, y2+h1+h_insert1, w2, h2));
+				if (x3 != -1 && y3 != -1) sub.AddState(StateDisable,   new Rect(x3+w1+w_insert1, y3+h1+h_insert1, w2, h2));
+				if (x4 != -1 && y4 != -1) sub.AddState(StateNormal_Checked,   new Rect(x4+w1+w_insert1, y4+h1+h_insert1, w2, h2));
+				if (x5 != -1 && y5 != -1) sub.AddState(StateHighlight_Checked,   new Rect(x5+w1+w_insert1, y5+h1+h_insert1, w2, h2));
+				if (x6 != -1 && y6 != -1) sub.AddState(StatePressed_Checked,   new Rect(x6+w1+w_insert1, y6+h1+h_insert1, w2, h2));
+				if (x7 != -1 && y7 != -1) sub.AddState(StateDisable_Checked,   new Rect(x7+w1+w_insert1, y7+h1+h_insert1, w2, h2));
 			}
 	
 			if (w3 > 0) {
-				sub = new SkinSubElement(el, new IntCoord(w1+w2, h1, w3, h2),  Align_Right + Align_VStretch );
-				if (x != -1 && y != -1) sub.AddState(StateNormal,    new IntCoord(x+w1+w2+w_insert1+w_insert2, y+h1+h_insert1, w3, h2));				
-				if (x1 != -1 && y1 != -1) sub.AddState(StateHighlight, new IntCoord(x1+w1+w2+w_insert1+w_insert2, y1+h1+h_insert1, w3, h2));
-				if (x2 != -1 && y2 != -1) sub.AddState(StatePressed,   new IntCoord(x2+w1+w2+w_insert1+w_insert2, y2+h1+h_insert1, w3, h2));
-				if (x3 != -1 && y3 != -1) sub.AddState(StateDisable,   new IntCoord(x3+w1+w2+w_insert1+w_insert2, y3+h1+h_insert1, w3, h2));
-				if (x4 != -1 && y4 != -1) sub.AddState(StateNormal_Checked,   new IntCoord(x4+w1+w2+w_insert1+w_insert2, y4+h1+h_insert1, w3, h2));
-				if (x5 != -1 && y5 != -1) sub.AddState(StateHighlight_Checked,   new IntCoord(x5+w1+w2+w_insert1+w_insert2, y5+h1+h_insert1, w3, h2));
-				if (x6 != -1 && y6 != -1) sub.AddState(StatePressed_Checked,   new IntCoord(x6+w1+w2+w_insert1+w_insert2, y6+h1+h_insert1, w3, h2));
-				if (x7 != -1 && y7 != -1) sub.AddState(StateDisable_Checked,   new IntCoord(x7+w1+w2+w_insert1+w_insert2, y7+h1+h_insert1, w3, h2));
+				sub = new SkinSubElement(el, new Rect(w1+w2, h1, w3, h2),  Align_Right + Align_VStretch );
+				if (x != -1 && y != -1) sub.AddState(StateNormal,    new Rect(x+w1+w2+w_insert1+w_insert2, y+h1+h_insert1, w3, h2));				
+				if (x1 != -1 && y1 != -1) sub.AddState(StateHighlight, new Rect(x1+w1+w2+w_insert1+w_insert2, y1+h1+h_insert1, w3, h2));
+				if (x2 != -1 && y2 != -1) sub.AddState(StatePressed,   new Rect(x2+w1+w2+w_insert1+w_insert2, y2+h1+h_insert1, w3, h2));
+				if (x3 != -1 && y3 != -1) sub.AddState(StateDisable,   new Rect(x3+w1+w2+w_insert1+w_insert2, y3+h1+h_insert1, w3, h2));
+				if (x4 != -1 && y4 != -1) sub.AddState(StateNormal_Checked,   new Rect(x4+w1+w2+w_insert1+w_insert2, y4+h1+h_insert1, w3, h2));
+				if (x5 != -1 && y5 != -1) sub.AddState(StateHighlight_Checked,   new Rect(x5+w1+w2+w_insert1+w_insert2, y5+h1+h_insert1, w3, h2));
+				if (x6 != -1 && y6 != -1) sub.AddState(StatePressed_Checked,   new Rect(x6+w1+w2+w_insert1+w_insert2, y6+h1+h_insert1, w3, h2));
+				if (x7 != -1 && y7 != -1) sub.AddState(StateDisable_Checked,   new Rect(x7+w1+w2+w_insert1+w_insert2, y7+h1+h_insert1, w3, h2));
 			}
 		}
 		//------------------------------------------------------------------------------------
 		if (h3 > 0) {
 			if (w1 > 0) {
-				sub = new SkinSubElement(el, new IntCoord(0, h1+h2, w1, h3),  Align_Left + Align_Bottom );
-				if (x != -1 && y != -1) sub.AddState(StateNormal,    new IntCoord(x, y+h1+h2+h_insert1+h_insert2, w1, h3));
-				if (x1 != -1 && y1 != -1) sub.AddState(StateHighlight, new IntCoord(x1, y1+h1+h2+h_insert1+h_insert2, w1, h3));
-				if (x2 != -1 && y2 != -1) sub.AddState(StatePressed,   new IntCoord(x2, y2+h1+h2+h_insert1+h_insert2, w1, h3));
-				if (x3 != -1 && y3 != -1) sub.AddState(StateDisable,   new IntCoord(x3, y3+h1+h2+h_insert1+h_insert2, w1, h3));
-				if (x4 != -1 && y4 != -1) sub.AddState(StateNormal_Checked,   new IntCoord(x4, y4+h1+h2+h_insert1+h_insert2, w1, h3));
-				if (x5 != -1 && y5 != -1) sub.AddState(StateHighlight_Checked,   new IntCoord(x5, y5+h1+h2+h_insert1+h_insert2, w1, h3));
-				if (x6 != -1 && y6 != -1) sub.AddState(StatePressed_Checked,   new IntCoord(x6, y6+h1+h2+h_insert1+h_insert2, w1, h3));
-				if (x7 != -1 && y7 != -1) sub.AddState(StateDisable_Checked,   new IntCoord(x7, y7+h1+h2+h_insert1+h_insert2, w1, h3));
+				sub = new SkinSubElement(el, new Rect(0, h1+h2, w1, h3),  Align_Left + Align_Bottom );
+				if (x != -1 && y != -1) sub.AddState(StateNormal,    new Rect(x, y+h1+h2+h_insert1+h_insert2, w1, h3));
+				if (x1 != -1 && y1 != -1) sub.AddState(StateHighlight, new Rect(x1, y1+h1+h2+h_insert1+h_insert2, w1, h3));
+				if (x2 != -1 && y2 != -1) sub.AddState(StatePressed,   new Rect(x2, y2+h1+h2+h_insert1+h_insert2, w1, h3));
+				if (x3 != -1 && y3 != -1) sub.AddState(StateDisable,   new Rect(x3, y3+h1+h2+h_insert1+h_insert2, w1, h3));
+				if (x4 != -1 && y4 != -1) sub.AddState(StateNormal_Checked,   new Rect(x4, y4+h1+h2+h_insert1+h_insert2, w1, h3));
+				if (x5 != -1 && y5 != -1) sub.AddState(StateHighlight_Checked,   new Rect(x5, y5+h1+h2+h_insert1+h_insert2, w1, h3));
+				if (x6 != -1 && y6 != -1) sub.AddState(StatePressed_Checked,   new Rect(x6, y6+h1+h2+h_insert1+h_insert2, w1, h3));
+				if (x7 != -1 && y7 != -1) sub.AddState(StateDisable_Checked,   new Rect(x7, y7+h1+h2+h_insert1+h_insert2, w1, h3));
 			}
 			if (w2 > 0) {
-				sub = new SkinSubElement(el, new IntCoord(w1, h1+h2, w2, h3),  Align_HStretch + Align_Bottom );
-				if (x != -1 && y != -1) sub.AddState(StateNormal,    new IntCoord(x+w1+w_insert1, y+h1+h2+h_insert1+h_insert2, w2, h3));
-				if (x1 != -1 && y1 != -1) sub.AddState(StateHighlight, new IntCoord(x1+w1+w_insert1, y1+h1+h2+h_insert1+h_insert2, w2, h3));
-				if (x2 != -1 && y2 != -1) sub.AddState(StatePressed,   new IntCoord(x2+w1+w_insert1, y2+h1+h2+h_insert1+h_insert2, w2, h3));
-				if (x3 != -1 && y3 != -1) sub.AddState(StateDisable,   new IntCoord(x3+w1+w_insert1, y3+h1+h2+h_insert1+h_insert2, w2, h3));
-				if (x4 != -1 && y4 != -1) sub.AddState(StateNormal_Checked,   new IntCoord(x4+w1+w_insert1, y4+h1+h2+h_insert1+h_insert2, w2, h3));
-				if (x5 != -1 && y5 != -1) sub.AddState(StateHighlight_Checked,   new IntCoord(x5+w1+w_insert1, y5+h1+h2+h_insert1+h_insert2, w2, h3));
-				if (x6 != -1 && y6 != -1) sub.AddState(StatePressed_Checked,   new IntCoord(x6+w1+w_insert1, y6+h1+h2+h_insert1+h_insert2, w2, h3));
-				if (x7 != -1 && y7 != -1) sub.AddState(StateDisable_Checked,   new IntCoord(x7+w1+w_insert1, y7+h1+h2+h_insert1+h_insert2, w2, h3));
+				sub = new SkinSubElement(el, new Rect(w1, h1+h2, w2, h3),  Align_HStretch + Align_Bottom );
+				if (x != -1 && y != -1) sub.AddState(StateNormal,    new Rect(x+w1+w_insert1, y+h1+h2+h_insert1+h_insert2, w2, h3));
+				if (x1 != -1 && y1 != -1) sub.AddState(StateHighlight, new Rect(x1+w1+w_insert1, y1+h1+h2+h_insert1+h_insert2, w2, h3));
+				if (x2 != -1 && y2 != -1) sub.AddState(StatePressed,   new Rect(x2+w1+w_insert1, y2+h1+h2+h_insert1+h_insert2, w2, h3));
+				if (x3 != -1 && y3 != -1) sub.AddState(StateDisable,   new Rect(x3+w1+w_insert1, y3+h1+h2+h_insert1+h_insert2, w2, h3));
+				if (x4 != -1 && y4 != -1) sub.AddState(StateNormal_Checked,   new Rect(x4+w1+w_insert1, y4+h1+h2+h_insert1+h_insert2, w2, h3));
+				if (x5 != -1 && y5 != -1) sub.AddState(StateHighlight_Checked,   new Rect(x5+w1+w_insert1, y5+h1+h2+h_insert1+h_insert2, w2, h3));
+				if (x6 != -1 && y6 != -1) sub.AddState(StatePressed_Checked,   new Rect(x6+w1+w_insert1, y6+h1+h2+h_insert1+h_insert2, w2, h3));
+				if (x7 != -1 && y7 != -1) sub.AddState(StateDisable_Checked,   new Rect(x7+w1+w_insert1, y7+h1+h2+h_insert1+h_insert2, w2, h3));
 			}
 			if (w3 > 0) {
-				sub = new SkinSubElement(el, new IntCoord(w1+w2, h1+h2, w3, h3),  Align_Right + Align_Bottom );
-				if (x != -1 && y != -1) sub.AddState(StateNormal,    new IntCoord(x+w1+w2+w_insert1+w_insert2, y+h1+h2+h_insert1+h_insert2, w3, h3));
-				if (x1 != -1 && y1 != -1) sub.AddState(StateHighlight, new IntCoord(x1+w1+w2+w_insert1+w_insert2, y1+h1+h2+h_insert1+h_insert2, w3, h3));
-				if (x2 != -1 && y2 != -1) sub.AddState(StatePressed,   new IntCoord(x2+w1+w2+w_insert1+w_insert2, y2+h1+h2+h_insert1+h_insert2, w3, h3));
-				if (x3 != -1 && y3 != -1) sub.AddState(StateDisable,   new IntCoord(x3+w1+w2+w_insert1+w_insert2, y3+h1+h2+h_insert1+h_insert2, w3, h3));
-				if (x4 != -1 && y4 != -1) sub.AddState(StateNormal_Checked,   new IntCoord(x4+w1+w2+w_insert1+w_insert2, y4+h1+h2+h_insert1+h_insert2, w3, h3));
-				if (x5 != -1 && y5 != -1) sub.AddState(StateHighlight_Checked,   new IntCoord(x5+w1+w2+w_insert1+w_insert2, y5+h1+h2+h_insert1+h_insert2, w3, h3));
-				if (x6 != -1 && y6 != -1) sub.AddState(StatePressed_Checked,   new IntCoord(x6+w1+w2+w_insert1+w_insert2, y6+h1+h2+h_insert1+h_insert2, w3, h3));
-				if (x7 != -1 && y7 != -1) sub.AddState(StateDisable_Checked,   new IntCoord(x7+w1+w2+w_insert1+w_insert2, y7+h1+h2+h_insert1+h_insert2, w3, h3));
+				sub = new SkinSubElement(el, new Rect(w1+w2, h1+h2, w3, h3),  Align_Right + Align_Bottom );
+				if (x != -1 && y != -1) sub.AddState(StateNormal,    new Rect(x+w1+w2+w_insert1+w_insert2, y+h1+h2+h_insert1+h_insert2, w3, h3));
+				if (x1 != -1 && y1 != -1) sub.AddState(StateHighlight, new Rect(x1+w1+w2+w_insert1+w_insert2, y1+h1+h2+h_insert1+h_insert2, w3, h3));
+				if (x2 != -1 && y2 != -1) sub.AddState(StatePressed,   new Rect(x2+w1+w2+w_insert1+w_insert2, y2+h1+h2+h_insert1+h_insert2, w3, h3));
+				if (x3 != -1 && y3 != -1) sub.AddState(StateDisable,   new Rect(x3+w1+w2+w_insert1+w_insert2, y3+h1+h2+h_insert1+h_insert2, w3, h3));
+				if (x4 != -1 && y4 != -1) sub.AddState(StateNormal_Checked,   new Rect(x4+w1+w2+w_insert1+w_insert2, y4+h1+h2+h_insert1+h_insert2, w3, h3));
+				if (x5 != -1 && y5 != -1) sub.AddState(StateHighlight_Checked,   new Rect(x5+w1+w2+w_insert1+w_insert2, y5+h1+h2+h_insert1+h_insert2, w3, h3));
+				if (x6 != -1 && y6 != -1) sub.AddState(StatePressed_Checked,   new Rect(x6+w1+w2+w_insert1+w_insert2, y6+h1+h2+h_insert1+h_insert2, w3, h3));
+				if (x7 != -1 && y7 != -1) sub.AddState(StateDisable_Checked,   new Rect(x7+w1+w2+w_insert1+w_insert2, y7+h1+h2+h_insert1+h_insert2, w3, h3));
 			}
 		}
 	}
 	
 	private class SkinSubElementState {
 		int state;
-		IntCoord texture_rect;
+		Rect texture_rect;
 		Color col;
 
-		public SkinSubElementState(int state, IntCoord texture_rect, Color col) {
+		public SkinSubElementState(int state, Rect texture_rect, Color col) {
 			this.state = state;
 			this.texture_rect = texture_rect;
 			this.col = col;
@@ -611,7 +611,7 @@ public class Skin {
 	           
 	           
 	           SkinElement el;
-	       		el = new SkinElement(this, name, texture_name, w, h, new IntCoord(0, 0, 0, 0));
+	       		el = new SkinElement(this, name, texture_name, w, h, new Rect(0, 0, 0, 0));
 	       		AddStatesCenter(el, h, w, x, y);	
 	         }
 	     }

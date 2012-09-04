@@ -17,6 +17,7 @@
 
 package a1;
 
+import a1.net.Packet;
 import com.ericsson.otp.erlang.OtpErlangObject;
 
 import java.util.Map;

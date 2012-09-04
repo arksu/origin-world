@@ -17,6 +17,8 @@
 
 package a1;
 
+import a1.net.Packet;
+
 public class ClaimPersonal {
     public int owner_id;
     public int object_id;

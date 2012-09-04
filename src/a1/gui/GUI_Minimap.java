@@ -14,10 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package a1.gui;
 
 import a1.*;
 import a1.net.NetGame;
+import a1.utils.Rect;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -206,7 +208,7 @@ public class GUI_Minimap extends GUI_Control {
 			// Получаем координаты для риосвания относительно положения контрола
 			Coord drawCoord = abs_pos.add(MMTopLeftCoords);
 			// Ножнечги
-			Render2D.PushScissor(new IntCoord(abs_pos.x + 1, abs_pos.y + 1, size.x - 15, size.y - 15));
+			Render2D.PushScissor(new Rect(abs_pos.x + 1, abs_pos.y + 1, size.x - 15, size.y - 15));
 			if (MinimapSprite != null) MinimapSprite.draw(drawCoord);
 			// Отрисовка всех показываемых объектов
 			for (MDrawableObject obj : MDObjects) {

@@ -14,11 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package a1.net;
 
 import a1.Lang;
 import a1.Main;
-import a1.Packet;
 import a1.dialogs.dlg_Game;
 import a1.gui.*;
 

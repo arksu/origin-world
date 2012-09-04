@@ -15,8 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package a1;
+package a1.net;
 
+import a1.Config;
+import a1.Log;
+import a1.Main;
 import a1.utils.MyThread;
 import a1.utils.Utils;
 
@@ -105,7 +108,7 @@ public class Connection {
                     int data_len = Utils.uint16d(buf, 0)-HEADER_SIZE;
                     int type = Utils.unsigned_byte(buf[2]);
                     if (Config.debug_packets)
-                        Log.debug("new pkt: ["+type+"] len="+data_len);
+                        Log.debug("new pkt: [" + type + "] len=" + data_len);
                     cur_packet = new Packet(type, data_len);
                     buf = cur_packet.add_data(buf, HEADER_SIZE, buf.length- HEADER_SIZE);
                     if (cur_packet.is_ready()) {
@@ -259,6 +262,6 @@ public class Connection {
             Main.DataSended += data.length;
             socket.getOutputStream().write(data);
             socket.getOutputStream().flush();
-        } catch(IOException e) { }
+        } catch(Exception e) { }
     }
 }

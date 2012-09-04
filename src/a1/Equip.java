@@ -21,6 +21,7 @@ import a1.gui.GUI;
 import a1.gui.GUI_Equip;
 import a1.gui.GUI_Window;
 import a1.net.NetGame;
+import a1.net.Packet;
 import a1.utils.InventoryClick;
 
 public class Equip {

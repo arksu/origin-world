@@ -25,6 +25,7 @@ import a1.gui.GUI;
 import a1.gui.GUI_Debug;
 import a1.gui.Skin;
 import a1.gui.Skin_MyGUI;
+import a1.net.Connection;
 import a1.net.NetGame;
 import a1.net.NetLogin;
 import a1.obj.ObjectVisual;
@@ -77,7 +78,9 @@ public class Main {
 		instance = new Main(); 
 		// грузим опции из файла
 		Config.load_options();
-		// ставим если нужен дебаг движка в консоли
+        // загрузим перевод
+        Lang.LoadTranslate();
+        // ставим если нужен дебаг движка в консоли
 		if (Config.DebugEngine)	System.setProperty("org.lwjgl.util.Debug","true");
 		// парсим параметры запуска
 		Config.ParseCMD(args); 
@@ -474,7 +477,6 @@ public class Main {
 			TilesDebug.ParseTilesXML(null);
 		
 		Cursor.setCursor("");
-		Lang.LoadTranslate();
 		skin.ParseIcons();
 	}
 	
