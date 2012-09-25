@@ -30,7 +30,7 @@ import com.ericsson.otp.erlang.OtpErlangTuple;
 public class claim extends ObjectVisual {
     boolean is_error = false;
     boolean inited = false;
-    int claim_owner = 0;
+    public int claim_owner = 0;
     ClaimPersonal claim = null;
 
     GUI_SpinEdit ed_combat, ed_industry, ed_nature;
@@ -47,7 +47,14 @@ public class claim extends ObjectVisual {
             return;
         }
 
+        Calc();
+    }
+
+    protected void Calc() {
         if (claim_owner == Player.CharID) {
+            required_exp = 0;
+            total_exp = 0;
+
             // ищем клайм с таким овнером
             if (Claims.claims.containsKey(claim_owner) && Claims.claims.get(claim_owner).object_id == objid) {
                 // клайм есть. отобразим его состояние
@@ -62,10 +69,21 @@ public class claim extends ObjectVisual {
         } else {
             is_error = true;
         }
+
+    }
+
+    public void RefreshClaims() {
+        Calc();
+        RefreshCtrls();
     }
 
     @Override
     protected void PlaceCtrls() {
+        if (is_error) {
+            GUI_Label l = new GUI_Label(wnd);
+            l.caption = Lang.getTranslate("generic", "stranger_claim");
+            l.SetPos(10, 50);
+        } else
         if (!inited) {
             GUI_Button init_btn = new GUI_Button(wnd) {
                 @Override

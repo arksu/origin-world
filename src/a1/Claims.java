@@ -20,6 +20,8 @@ package a1;
 
 import a1.gui.GUI_Map;
 import a1.net.Packet;
+import a1.obj.ObjectVisual;
+import a1.obj.claim;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,6 +35,12 @@ public class Claims {
         ClaimPersonal c = new ClaimPersonal(pkt, id);
         claims.put(id, c);
         Refresh();
+
+        for (ObjectVisual ov : ObjectVisual.obj_list.values()) {
+            if (ov instanceof claim) {
+                ((claim)ov).RefreshClaims();
+            }
+        }
     }
 
     public static void RecvClaimRemove(Packet pkt) {

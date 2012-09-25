@@ -759,7 +759,7 @@ public class GUI_Map extends GUI_Control {
 		        for(int u = render_parts.size() - 1; u>=0; u--)
 		        {
 		            RenderPart p = render_parts.get(u);
-                    if (p.owner != place_obj && p.check_hit(gui.mouse_pos.mul(1 / scale))) {
+                    if (p.owner != place_obj && p.owner != null && p.check_hit(gui.mouse_pos.mul(1 / scale))) {
 		        		mouse_in_object = p.owner;
 		        		break;
 		        	}
@@ -767,7 +767,7 @@ public class GUI_Map extends GUI_Control {
 		        if (mouse_in_object == null && Config.hide_overlapped) {
 		        	ignore_overlapped = true;
                     for (RenderPart p : render_parts) {
-                        if (p.is_overlapped && p.owner != place_obj && p.check_hit(gui.mouse_pos.mul(1 / scale))) {
+                        if (p.is_overlapped && p.owner != place_obj && p.owner != null && p.check_hit(gui.mouse_pos.mul(1 / scale))) {
                             mouse_in_object = p.owner;
                             break;
                         }

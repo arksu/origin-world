@@ -24,7 +24,6 @@ import a1.gui.GUI_Window;
 import a1.net.NetGame;
 import a1.utils.InventoryClick;
 import com.ericsson.otp.erlang.OtpErlangAtom;
-import com.ericsson.otp.erlang.OtpErlangInt;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.ericsson.otp.erlang.OtpErlangTuple;
 
@@ -169,20 +168,7 @@ public class inventory extends ObjectVisual {
     public void SendClick(InventoryClick click) {
         OtpErlangObject[] arr = new OtpErlangObject[2];
         arr[0] = new OtpErlangAtom("inv_click");
-
-        // #inv_click
-        OtpErlangObject[] click_arr = new OtpErlangObject[9];
-        click_arr[0] = new OtpErlangAtom("inv_click");
-        click_arr[1] = new OtpErlangInt(click.objid);
-        click_arr[2] = new OtpErlangInt(click.inv_objid);
-        click_arr[3] = new OtpErlangInt(click.btn);
-        click_arr[4] = new OtpErlangInt(click.mod);
-        click_arr[5] = new OtpErlangInt(click.x);
-        click_arr[6] = new OtpErlangInt(click.y);
-        click_arr[7] = new OtpErlangInt(click.offset_x);
-        click_arr[8] = new OtpErlangInt(click.offset_y);
-
-        arr[1] = new OtpErlangTuple(click_arr);
+        arr[1] = click.MakeTerm();
 
         OtpErlangTuple ack = new OtpErlangTuple(arr);
         Log.debug("inv click: " + ack.toString());

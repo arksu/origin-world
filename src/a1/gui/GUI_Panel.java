@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package a1.gui;
 
 import a1.Render2D;
@@ -22,7 +23,7 @@ import org.newdawn.slick.Color;
 
 public class GUI_Panel extends GUI_Control {
 	public boolean pressed = false;
-	public enum RenderMode {rmSkin, rmColor, rmNone};
+	public enum RenderMode {rmSkin, rmColor, rmNone}
 	public Color bg_color = Color.white;
 	public RenderMode render_mode = RenderMode.rmNone;
 	

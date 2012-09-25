@@ -35,7 +35,7 @@ public class ObjectVisual {
     protected Packet data;
     protected GUI_Window wnd;
 
-    private static Map<Integer, ObjectVisual> obj_list = new HashMap<Integer, ObjectVisual>();
+    public static Map<Integer, ObjectVisual> obj_list = new HashMap<Integer, ObjectVisual>();
 
     public static void RecvVisualState(Packet pkt) {
         int id = pkt.read_int();
@@ -46,6 +46,10 @@ public class ObjectVisual {
         Log.debug("visual obj : " + id + " type: " + obj_type + "["+v_type+"] size: " + data.len);
 
         ObjectVisual ov = obj_list.get(id);
+        if (ov != null && !ov.obj_type.equals(obj_type)) {
+            CloseObj(id);
+            ov = null;
+        }
         if (ov == null) {
             try {
                 //-------------------------
@@ -53,6 +57,7 @@ public class ObjectVisual {
                 if ("claim".equals(v_type))       ov = new claim();
                 if ("inventory".equals(v_type))   ov = new inventory();
                 if ("build".equals(v_type))       ov = new build();
+                if ("bonfire".equals(v_type))     ov = new bonfire();
                 //-------------------------
 
                 if (ov != null) {
@@ -109,7 +114,7 @@ public class ObjectVisual {
         }
     }
 
-    private void RefreshCtrls() {
+    protected void RefreshCtrls() {
         wnd.UnlinkChilds();
         PlaceCtrls();
     }

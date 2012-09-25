@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package a1.gui;
 
 import a1.net.NetGame;
@@ -30,41 +31,41 @@ public class GUI_RunModesPanel extends GUI_Control {
 			
 			public void DoClick() {
 				SetRunMode(1);
-			};
+			}
 			
 			protected boolean getPressed() {
 				return CurrentMode == 1;
-			};
+			}
 		};
 		btn2 = new GUI_Button(this){
 			
 			public void DoClick() {
 				SetRunMode(2);
-			};
+			}
 			
 			protected boolean getPressed() {
 				return CurrentMode == 2;
-			};
+			}
 		};
 		btn3 = new GUI_Button(this){
 			
 			public void DoClick() {
 				SetRunMode(3);
-			};
+			}
 			
 			protected boolean getPressed() {
 				return CurrentMode == 3;
-			};
+			}
 		};
 		btn4 = new GUI_Button(this){
 			
 			public void DoClick() {
 				SetRunMode(4);
-			};
+			}
 			
 			protected boolean getPressed() {
 				return CurrentMode == 4;
-			};
+			}
 		};
 		
 		btn1.caption = "1";

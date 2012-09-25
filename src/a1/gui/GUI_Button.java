@@ -20,7 +20,6 @@ package a1.gui;
 import a1.Input;
 import a1.Lang;
 import a1.Render2D;
-import a1.net.NetGame;
 import a1.net.Packet;
 import org.newdawn.slick.Color;
 
@@ -41,11 +40,6 @@ public class GUI_Button extends GUI_Control {
 	}
 
 	public void DoClick() {
-		if (id > 0) {
-			int mx = gui.mouse_pos.x - abs_pos.x;
-			int my = gui.mouse_pos.y - abs_pos.y;
-			NetGame.SEND_gui_click(0,0,mx, my, id, Input.MB_LEFT);
-		}
 	}
 	
 	// удерживать ли кнопку в нажатом состоянии

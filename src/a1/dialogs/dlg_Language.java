@@ -27,8 +27,9 @@ public class dlg_Language extends Dialog {
 	public static dlg_Language dlg = null;
 
 	GUI_Window wnd;
-	GUI_Button btn_en;
-	GUI_Button btn_ru;
+
+    int lang_btn_pos = 40;
+    int btn_margin = 30;
 	
 	static {
 		Dialog.AddType("dlg_language", new DialogFactory() {		
@@ -42,39 +43,35 @@ public class dlg_Language extends Dialog {
 		dlg = this;
 		wnd = new GUI_Window(GUI.getInstance().normal);
 		wnd.caption = "Choose language";
-		wnd.SetSize(300, 150);
-		wnd.Center();
+        wnd.SetSize(300, 100);
 		wnd.resizeable = false;
 		wnd.set_close_button(false);
-		
-		btn_en = new GUI_Button(wnd) {
-			public void DoClick() {
-				Config.current_lang = "en";
-				Config.save_options();
-				Lang.LoadTranslate();
-				Dialog.HideAll();
-				dlg_Login.ShowLogin();
-			}
-		};
-		btn_en.SetPos(40, 60);
-		btn_en.SetSize(200,20);
-		btn_en.caption = "English";
-		btn_en.CenterX();
-		
-		btn_ru = new GUI_Button(wnd) {
-			public void DoClick() {
-				Config.current_lang = "ru";
-				Config.save_options();
-				Lang.LoadTranslate();
-				Dialog.HideAll();
-				dlg_Login.ShowLogin();
-			}
-		};
-		btn_ru.SetPos(40, 90);
-		btn_ru.SetSize(200,20);
-		btn_ru.caption = "Russian";
-		btn_ru.CenterX();
+
+        for (Lang.Struct s : Lang.langs) {
+            AddLangButton(s.full_name, s.name);
+        }
+        wnd.SetSize(300, lang_btn_pos);
+        wnd.Center();
 	}
+
+    private void AddLangButton(String lang_name, String lang) {
+        GUI_Button btn = new GUI_Button(wnd) {
+
+            public void DoClick() {
+                Config.current_lang = tag;
+                Config.save_options();
+                Lang.LoadTranslate();
+                Dialog.HideAll();
+                dlg_Login.ShowLogin();
+            }
+        };
+        btn.tag = lang;
+        btn.SetPos(40, lang_btn_pos);
+        lang_btn_pos += btn_margin;
+        btn.SetSize(200,20);
+        btn.caption = lang_name;
+        btn.CenterX();
+    }
 
 	public void DoHide() {
 		dlg = null;

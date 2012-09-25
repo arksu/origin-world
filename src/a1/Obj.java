@@ -55,6 +55,8 @@ public class Obj {
     public List<Integer> links = new ArrayList<Integer>();
     // теги для слоев
     public Set<Integer> tags = new HashSet<Integer>();
+    // экипировка чара
+    public ObjEquip equip = null;
 	
 	// hardcode ))
 	protected Coord step_offset = Coord.z; // отступ для отрисовки (нужно для подпрыгивающего чара в нужные кадры анимации)
@@ -153,26 +155,28 @@ public class Obj {
 		// дефолт по умолчанию
 		step_offset = Coord.z;
 		add_draw_part(draw_name, c, addz);
-
-		// TODO : пропарсим эквип и добавим части эквипа
 	}
+
+    protected String get_draw_name(String draw_name) {
+        String dr_name = draw_name;
+        // если движемся
+        if (is_moving()) dr_name += "_move";
+
+        // учтем направление
+        if (direction != 0)
+            dr_name += "_"+direction;
+
+        // check params
+        if (is_opened)
+            dr_name += "_opened";
+
+        return dr_name;
+    }
 	
 	private void add_draw_part(String draw_name, Coord c, int addz) {
-		String dr_name = draw_name;
-		// если движемся
-		if (is_moving()) dr_name += "_move";
-		
-		// учтем направление
-		if (direction != 0) 
-			dr_name += "_"+direction;
-		
-		// check params
-		if (is_opened)
-			dr_name += "_opened";
-
+		String dr_name = get_draw_name(draw_name);
 
         step_offset = step_offset.add(get_step_offset());
-
 
         // игрока рисуем особенным способом
 		if (obj_type.equals("player")) {
@@ -225,12 +229,16 @@ public class Obj {
 			}
 			// тень выводим отдельно чтобы не прыгала вместе с игроком
 			if (!in_water) add_part(draw_items.get("player_shadow"), c, addz, true);
+
+            if (equip != null)
+                equip.AddParts(this, c, addz);
 		} else {
 			add_part(draw_items.get(dr_name), c, addz, ignore_overlap);
 		}
 	}
-	
-	private void add_part(Resource.ResDraw dr, Coord c, int addz, boolean ignore_overlap) {
+
+
+    public void add_part(Resource.ResDraw dr, Coord c, int addz, boolean ignore_overlap) {
 		if (dr == null) {
 			return;
 		}
@@ -273,6 +281,7 @@ public class Obj {
 
         if (l.tag != 0) {
             if (tags.contains(l.tag))
+
                 GUI.map.render_parts.add(new RenderPart(c, cn, l, this, l.addz + addz, ignore_overlap));
         } else
             GUI.map.render_parts.add(new RenderPart(c, cn, l, this, l.addz + addz, ignore_overlap));

@@ -198,7 +198,14 @@ public class GUI_InvItem extends GUI_Control {
 	
 	public void DoRender() {
 		if (inited) {
+            // картинка
 			getSkin().Draw("item_" + icon_name, abs_pos.x+1, abs_pos.y+1);
+
+            // прогресс
+            if (max > 0)
+                DrawProgress( (float)progress / (float)max );
+
+            // качество в уголке
 			Coord sz = getSkin().GetElementSize("item_" + icon_name);
 			Render2D.Text("smallfont", 
 					abs_pos.x+1, abs_pos.y+1, 
@@ -207,6 +214,15 @@ public class GUI_InvItem extends GUI_Control {
 					Integer.toString(quality), 
 					Color.white);
 
+            if (Config.debug && max != 0)
+            Render2D.Text("smallfont",
+                    abs_pos.x+1, abs_pos.y+1,
+                    sz.x-2, sz.y-1,
+                    Render2D.Align_Left + Render2D.Align_Top,
+                    Integer.toString(progress) + "/" + max,
+                    Color.white);
+
+            // подсветка наведения "руки"
             if (Player.hand.isExist()) {
                 int mx = gui.mouse_pos.x - abs_pos.x;
                 int my = gui.mouse_pos.y - abs_pos.y;
@@ -225,6 +241,17 @@ public class GUI_InvItem extends GUI_Control {
             }
 		}
 	}
+
+    private void DrawProgress(float p) {
+        if (p == 0) return;
+        int fp = 90 + (int)(p * 360);
+        Render2D.Disable2D();
+        Render2D.ChangeColor(new Color(0, 200, 0, 100));
+        Render2D.PushScissor(new Rect(abs_pos.add(1), new Coord(32, 32)));
+        Render2D.FillEllipse(abs_pos.add(16), new Coord(30, 30), 90, fp);
+        Render2D.PopScissor();
+        Render2D.Enable2D();
+    }
 
     public boolean inRect(Rect r) {
         boolean bx = false;

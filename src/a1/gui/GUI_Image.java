@@ -18,7 +18,6 @@
 package a1.gui;
 
 import a1.Coord;
-import a1.net.NetGame;
 import org.newdawn.slick.Color;
 
 // класс для вывода картинки из скина
@@ -32,15 +31,8 @@ public class GUI_Image extends GUI_Control {
 	}
 	
 	public boolean DoMouseBtn(int btn, boolean down) {
-		if (drag) return false;
-		
-		if (MouseInMe() && down) {
-			if (id > 0)
-				NetGame.SEND_gui_click(pos.x, pos.y, gui.mouse_pos.x - abs_pos.x, gui.mouse_pos.y - abs_pos.y, id, btn);
-			return true;
-		}
-		return false;
-	}
+        return !drag && MouseInMe() && down;
+    }
 	
 	public boolean CheckMouseInControl() {
         return !drag && visible;

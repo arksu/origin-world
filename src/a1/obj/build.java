@@ -54,6 +54,18 @@ public class build extends ObjectVisual {
                 public void DoClick() {
                     SendSlotClick(order);
                 }
+
+                @Override
+                public boolean DoMouseWheel(boolean isUp, int len) {
+                    if (MouseInMe()) {
+                        int c = len;
+                        while (c > 0) {
+                            SendMouseWheel(order);
+                            c--;
+                        }
+                        return true;
+                    } else return false;
+                }
             };
             gs.order = n;
             gs.Assign(s);
@@ -85,7 +97,14 @@ public class build extends ObjectVisual {
         arr[1] = new OtpErlangInt(n);
 
         NetGame.SEND_object_visual_ack(objid, new OtpErlangTuple(arr));
+    }
 
+    protected void SendMouseWheel(int slot) {
+        OtpErlangObject[] arr = new OtpErlangObject[2];
+        arr[0] = new OtpErlangAtom("slot_wheel");
+        arr[1] = new OtpErlangInt(slot);
+
+        NetGame.SEND_object_visual_ack(objid, new OtpErlangTuple(arr));
     }
 
     public class BuildSlot {

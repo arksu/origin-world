@@ -404,6 +404,7 @@ public class Main {
 				s += " " + Integer.toString(i);
 		}
 		RenderDebugRow("Keys: " + s);
+        RenderDebugRow("Last keyboard: "+Input.debug_str);
 
 		if (GUI.getInstance().mouse_in_control != null)
 			RenderDebugRow("mouse in control: "
@@ -550,7 +551,6 @@ public class Main {
 		Dialog.HideAll();
         ObjectVisual.CloseAll();
         Hotbar.ClearAll();
-		GUI.getInstance().FreeRemoteControls();
 		Cursor.setCursor("");
 		
 		if (GameConnect != null)

@@ -18,9 +18,12 @@
 package a1.gui;
 
 
-import a1.*;
+import a1.Config;
+import a1.Coord;
+import a1.Input;
+import a1.Main;
 import a1.gui.utils.DragInfo;
-import org.newdawn.slick.Color;
+import a1.gui.utils.SimpleHint;
 
 
 public class GUI {
@@ -97,14 +100,14 @@ public class GUI {
 		
 		int w, h;
 		String text = "";
-		String hint_font = "default";
-		
+
 		// получаем размер
 		if (mouse_in_control.is_simple_hint) {
 			text = mouse_in_control.getHint();
-			if (text.length() == 0) return;
-			w = Render2D.GetTextWidth(hint_font, text)+8;
-			h = Render2D.GetTextHeight(hint_font, text)+8;
+			if (text == null || text.length() == 0) return;
+            Coord sz = SimpleHint.getSize(text);
+			w = sz.x;
+			h = sz.y;
 		} else {
 			Coord sz = mouse_in_control.getHintSize();
 			w = sz.x;
@@ -122,7 +125,7 @@ public class GUI {
 		// выводим хинт
 		if (mouse_in_control.need_hint_bg) Main.skin.Draw("hint", x, y, w, h);
 		if (mouse_in_control.is_simple_hint) {
-			Render2D.Text(hint_font, x, y, w, h, Render2D.Align_Center, text, Color.white);
+			SimpleHint.Render(x, y, w, h, text);
 		} else {
 			mouse_in_control.RenderHint(x, y, w, h);
 		}
@@ -355,14 +358,6 @@ public class GUI {
             drag_info.state = DragInfo.DRAG_STATE_NONE;
         }
 		EndDrag(true);
-	}
-	
-	public GUI_Control getRemoteControl(int id) {
-		return root.getByID(id);
-	}
-	
-	public void FreeRemoteControls() {
-		root.FreeRemoteControls();
 	}
 	
 	public void ResolutionChanged() {

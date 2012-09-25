@@ -44,7 +44,7 @@ public class BitmapFont {
 		private static final int DISPLAY_LIST_CACHE_SIZE = 200;
 		
 		/** The highest character that AngelCodeFont will support. */
-		private static final int MAX_CHAR = 2000;
+		private static final int MAX_CHAR = 9000;
 
 		/** True if this font should use display list caching */
 		private boolean displayListCaching = true;

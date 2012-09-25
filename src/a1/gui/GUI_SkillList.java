@@ -38,46 +38,24 @@ public class GUI_SkillList extends GUI_ListBox {
 
     public GUI_SkillList(GUI_Control parent) {
         super(parent);
-        is_simple_hint = false;
     }
 
-    public void RenderHint(int x, int y, int w, int h) {
-        List<String> ls = getSkillHint();
-        if (ls != null) {
-            int rh = Render2D.GetTextHeight(hint_font);
-            int i = 0;
-            for (String hn : ls) {
-                Render2D.Text(hint_font, x+4, y+rh*i, w, h, Render2D.Align_Default, hn, Color.white);
-                i++;
-            }
-        }
-    }
+    @Override
+    public String getHint() {
+        String str = "";
 
-    public Coord getHintSize() {
-        List<String> ls = getSkillHint();
-        if (ls != null) {
-            int rh = Render2D.GetTextHeight(hint_font);
-            int rw = 0;
-            for (String hn : ls) {
-                int cw = Render2D.GetTextWidth(hint_font, hn);
-                if (cw > rw) rw = cw;
-            }
-            return new Coord(rw+10, (rh * ls.size())+10);
-        } else return Coord.z;
-    }
-    
-    protected List<String> getSkillHint() {
         int sel = GetMouseItemIndex();
         if (sel < 0) return null;
-                
         Skill s = skill_list.get( sel );
+
         if (s != null) {
-            List<String> ls = new ArrayList<String>();
-            if (s.level == 0) ls.add("req exp : "+s.req_exp);
-            ls.add(Lang.getTranslate("skills",s.name));
-            return ls;
-        } else return null;
+            if (s.level == 0) str += "req exp : "+s.req_exp+"%n";
+            str += Lang.getTranslate("skills","hint_"+s.name);
+        }
+
+        return str;
     }
+
 
     public void SetKnowledge(Knowledge k) {
         knw = k;
@@ -105,7 +83,7 @@ public class GUI_SkillList extends GUI_ListBox {
         Skill s = skill_list.get(index);
         if (s != null) {
             Color col = (s.level > 0 ? (s.level > knw.level?Color.red:Color.white):Color.gray);
-            Render2D.Text(font_name, x, y, skill_list.get(index).name, col);
+            Render2D.Text(font_name, x, y, Lang.getTranslate("skills",skill_list.get(index).name), col);
             Render2D.Text(font_name, x+LV_OFFSET, y,
                     String.valueOf(s.level), col);
             if (s.level > 0)

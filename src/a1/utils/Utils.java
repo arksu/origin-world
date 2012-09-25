@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package a1.utils;
 
 import a1.Config;
@@ -221,6 +222,14 @@ public class Utils {
 		}
 		return "";
 	}
+
+    public static OtpErlangList ErlngList(OtpErlangObject e) {
+        if (e instanceof OtpErlangList)
+            return ((OtpErlangList) e);
+        if (e instanceof OtpErlangString)
+            return new OtpErlangList( ((OtpErlangString)e).stringValue() );
+        return null;
+    }
 
     public static String getHexString(byte[] b) {
         String result = "";

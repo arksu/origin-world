@@ -36,7 +36,7 @@ public class dlg_Login extends Dialog {
 	GUI_Label status;
 	GUI_Button btn_lang;
 	GUI_Checkbox save_pass;
-	GUI_Texture logo;
+	GUI_Texture logo, gpl_logo;
 
 	static {
 		Dialog.AddType("dlg_login", new DialogFactory() {		
@@ -67,6 +67,10 @@ public class dlg_Login extends Dialog {
 		logo = new GUI_Texture(GUI.getInstance().normal);
 		logo.setTexture(Resource.getTexture("origin_logo"));
 		logo.SetSize(512, 128);
+
+        gpl_logo = new GUI_Texture(GUI.getInstance().normal);
+        gpl_logo.setTexture(Resource.getTexture("gplv3logo"));
+        gpl_logo.SetSize(128, 32);
 		
 		
 		user = new GUI_Edit(wnd){
@@ -127,6 +131,7 @@ public class dlg_Login extends Dialog {
 		wnd.Center();
 		logo.SetPos(100, 100);
 		logo.CenterX();
+        gpl_logo.SetPos(20, Config.getScreenHeight()-52);
 		btn_lang.SetPos(Config.getScreenWidth() - btn_lang.size.x - 10, Config.getScreenHeight() - btn_lang.size.y - 10);
 	}
 
@@ -138,6 +143,8 @@ public class dlg_Login extends Dialog {
 		btn_lang = null;
 		logo.Unlink();
 		logo = null;
+        gpl_logo.Unlink();
+        gpl_logo = null;
 	}
 	
 	public void DoUpdate() {

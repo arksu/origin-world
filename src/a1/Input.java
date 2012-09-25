@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package a1;
 
 
@@ -37,6 +38,8 @@ public class Input {
 	public static final int MB_RIGHT = 1;
 	public static final int MB_MIDDLE = 2;
 	public static final int MB_DOUBLE = 3;
+
+    public static String debug_str = "";
 	
 	public Input(GUI gui) {
 		this.gui = gui;
@@ -73,11 +76,13 @@ public class Input {
 		}
 		
 		// обрабатываем введеный текст
-		while (Keyboard.next()) {			
-			gui.HandleKey(	Lang.GetChar(Keyboard.getEventCharacter()), 
+		while (Keyboard.next()) {
+			gui.HandleKey(	Lang.GetChar(Keyboard.getEventCharacter()),
 							Keyboard.getEventKey(), 
 							Keyboard.getEventKeyState()
 						 );
+
+            debug_str = "char="+Keyboard.getEventCharacter()+" key="+Keyboard.getEventKey()+" state="+Keyboard.getEventKeyState();
 		}		
 	} 
 	

@@ -20,12 +20,15 @@ package a1;
 import a1.net.Packet;
 import com.ericsson.otp.erlang.OtpErlangObject;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 public class ObjCache {
 	// objid, obj
 	public static final Map<Integer, Obj> objs = new TreeMap<Integer, Obj>();
+    public static final List<ObjLocal> local = new LinkedList<ObjLocal>();
 	
 	static public Obj get(int id) {
 		if (objs.containsKey(id)) {
@@ -180,6 +183,7 @@ public class ObjCache {
 	
 	static public void ClearAll() {
 		objs.clear();
+        local.clear();
 	}
 	
 	static public void update() {

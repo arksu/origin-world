@@ -48,7 +48,7 @@ public class net_Craft extends NetHandler {
 				dlg_Game.dlg.craft_wnds.add(wnd);
 				
 				wnd.caption = Lang.getTranslate("generic", "craft") + " " + Lang.getTranslate("server", CraftName);
-				wnd.SetSize(300, 200);
+				wnd.SetSize(300, 250);
 				wnd.tag = CraftName;
 				wnd.Center();
 				
@@ -59,7 +59,7 @@ public class net_Craft extends NetHandler {
 					}
 				};
 				btn.tag = CraftName;
-				btn.SetPos(30,150);
+				btn.SetPos(30,wnd.Height() - 35);
 				btn.SetSize(100,20);
 				btn.caption = Lang.getTranslate("generic", "craft");
 
@@ -69,52 +69,73 @@ public class net_Craft extends NetHandler {
 					}
 				};
 				btn.tag = CraftName;
-				btn.SetPos(180,150);
+				btn.SetPos(180,wnd.Height() - 35);
 				btn.SetSize(100,20);
 				btn.caption = Lang.getTranslate("generic", "craft_all");
-				
+
+                // иконки результата
+                GUI_Label lbl = new GUI_Label(wnd);
+                lbl.caption = Lang.getTranslate("generic", "result_items");
+                lbl.SetPos(10, 40);
+
+                GUI_Panel final_pnl = new GUI_Panel(wnd);
+                final_pnl.render_mode = GUI_Panel.RenderMode.rmSkin;
+                final_pnl.skin_element = "listbox";
+                final_pnl.SetPos(10, 65);
 				int final_count, req_count, count;
 				String image_name;
 				String hint;
 				final_count = pkt.read_int();
-				int ax, ay;
-				ax = 30; ay = 30;
+                final_pnl.SetSize(final_count*40 + 10, 50);
+                int ax, ay;
+				ax = 10; ay = 10;
 				while (final_count > 0) {
 					final_count--;
 					image_name = pkt.read_string_ascii();
 					hint = pkt.read_string_ascii();
 					count = pkt.read_int();
 					
-					GUI_Image img = new GUI_Image(wnd);
+					GUI_Image img = new GUI_Image(final_pnl);
 					img.skin_element = "icon_"+image_name;
+                    if (!img.getSkin().hasElement(img.skin_element)) img.skin_element = "item_"+image_name;
 					img.simple_hint = Lang.getTranslate("server", hint);
 					img.SetSize(Main.skin.GetElementSize(img.skin_element));
 					img.SetPos(ax,ay);
 					ax += 40;
 					
-					GUI_Label lbl = new GUI_Label(img);
+					lbl = new GUI_Label(img);
 					lbl.caption = String.valueOf(count);
-					lbl.SetPos(10,10);
+					lbl.SetPos(img.size.sub(10, 20));
 				}
-				
-				ax = 30; ay = 80;
+
+                // иконки требуемых материалов
+                lbl = new GUI_Label(wnd);
+                lbl.caption = Lang.getTranslate("generic", "required_items");
+                lbl.SetPos(10, 120);
+                GUI_Panel req_pnl = new GUI_Panel(wnd);
+                req_pnl.render_mode = GUI_Panel.RenderMode.rmSkin;
+                req_pnl.skin_element = "listbox";
+                req_pnl.SetPos(10, 145);
+                ax = 10; ay = 10;
 				req_count = pkt.read_int();
+                req_pnl.SetSize(req_count*40 + 10, 50);
 				while (req_count > 0) {
 					req_count--;
 					image_name = pkt.read_string_ascii();
 					hint = pkt.read_string_ascii();
 					count = pkt.read_int();
 					
-					GUI_Image img = new GUI_Image(wnd);
+					GUI_Image img = new GUI_Image(req_pnl);
 					img.skin_element = "icon_"+image_name;
+                    if (!img.getSkin().hasElement(img.skin_element)) img.skin_element = "item_"+image_name;
 					img.simple_hint = Lang.getTranslate("server", hint);
 					img.SetSize(Main.skin.GetElementSize(img.skin_element));
 					img.SetPos(ax,ay);
 					ax += 40;
 					
-					GUI_Label lbl = new GUI_Label(img);
+					lbl = new GUI_Label(img);
 					lbl.caption = String.valueOf(count);
-					lbl.SetPos(10,10);					
+                    lbl.SetPos(img.size.sub(10, 20));
 				}
 				return true;
 		}

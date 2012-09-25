@@ -456,14 +456,7 @@ public class NetGame {
     public static void SEND_InventoryClick(InventoryClick click) {
         Log.debug("send inv click: "+click.objid+" inv="+click.inv_objid+" btn="+click.btn+" mod="+click.mod+" offset="+click.offset_x+","+click.offset_y);
         Packet p = new Packet(GAMESERVER_INVENTORY_CLICK);
-        p.write_int(click.objid);
-        p.write_int(click.inv_objid);
-        p.write_byte((byte) click.btn);
-        p.write_byte((byte)click.mod);
-        p.write_byte((byte)click.x);
-        p.write_byte((byte)click.y);
-        p.write_word(click.offset_x);
-        p.write_word(click.offset_y);
+        click.MakePkt(p);
         p.Send(GameConnect);
     }
 

@@ -21,7 +21,6 @@ import a1.dialogs.dlg_Game;
 import a1.utils.Utils;
 import com.ericsson.otp.erlang.OtpErlangList;
 import com.ericsson.otp.erlang.OtpErlangObject;
-import com.ericsson.otp.erlang.OtpErlangString;
 import com.ericsson.otp.erlang.OtpErlangTuple;
 
 import java.util.Iterator;
@@ -80,36 +79,19 @@ public class ObjParam extends ObjAttr {
 		}
 
         else if (newp.type.equals("links")) {
-            if (newp.term instanceof OtpErlangList) {
-                o.links.clear();
-                Iterator<OtpErlangObject> itr = ((OtpErlangList) newp.term).iterator();
-                int index = 0;
-                while (itr.hasNext()) {
-                    index++;
-                    int lid = Utils.ErlangInt(itr.next());
-                    o.links.add(lid);
-                    Obj lo = ObjCache.get(lid);
-                    if (lo != null) {
-                        o.fill_follow_params(index, lo);
-                    }
+            OtpErlangList l = Utils.ErlngList(newp.term);
+            Iterator<OtpErlangObject> itr = l.iterator();
+            int index = 0;
+            while (itr.hasNext()) {
+                index++;
+                int lid = Utils.ErlangInt(itr.next());
+                o.links.add(lid);
+                Obj lo = ObjCache.get(lid);
+                if (lo != null) {
+                    o.fill_follow_params(index, lo);
                 }
-                Log.info("object links:"+o.links.toString());
             }
-            if (newp.term instanceof OtpErlangString) {
-                OtpErlangList l = new OtpErlangList( ((OtpErlangString)newp.term).stringValue() );
-                Iterator<OtpErlangObject> itr = l.iterator();
-                int index = 0;
-                while (itr.hasNext()) {
-                    index++;
-                    int lid = Utils.ErlangInt(itr.next());
-                    o.links.add(lid);
-                    Obj lo = ObjCache.get(lid);
-                    if (lo != null) {
-                        o.fill_follow_params(index, lo);
-                    }
-                }
-                Log.info("object links:"+o.links.toString());
-            }
+            Log.info("object links:"+o.links.toString());
         }
 
         else if (newp.type.equals("follow")) {
@@ -130,6 +112,10 @@ public class ObjParam extends ObjAttr {
                     o.fill_follow_params(index, lo);
                 }
             }
+        }
+
+        else if (newp.type.equals("equip")) {
+            o.equip = new ObjEquip(newp.term);
         }
 	}
 

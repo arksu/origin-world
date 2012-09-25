@@ -20,7 +20,6 @@ package a1.gui;
 import a1.Coord;
 import a1.Main;
 import a1.gui.utils.DragInfo;
-import a1.net.NetGame;
 import a1.utils.Rect;
 
 import static a1.utils.Utils.max;
@@ -37,6 +36,7 @@ public class GUI_Control {
 	public String skin_element = "";
 	// юзер тег
 	public String tag = "";
+    // юезр тег целочисленный
     public int tagi = 0;
 	// абсолютные координаты на экране
 	protected Coord abs_pos = Coord.z;
@@ -104,9 +104,7 @@ public class GUI_Control {
 
 	public void Unlink() {
 		if (terminated) return;
-		
-		if (id > 0)
-			NetGame.SEND_gui_destroy(id);
+
 		terminated = true;
 		DoDestroy();
 		synchronized (gui) {
@@ -124,31 +122,6 @@ public class GUI_Control {
 			next = null;
 			prev = null;
 		}
-	}
-	
-	public GUI_Control getByID(int id) {
-		if (id > 0) {
-			if (this.id == id) return this;
-			else {
-				GUI_Control res = null;
-				for (GUI_Control c = child; c != null; c = c.next) {
-					res = c.getByID(id);
-					if (res != null) return res;
-				}
-			}
-		} 
-		return null;
-	}
-	
-	public void FreeRemoteControls() {
-		for (GUI_Control c = child; c != null; c = c.next) {
-			if (c.id > 0) {
-				c.Unlink();
-				FreeRemoteControls();
-				return;
-			} else c.FreeRemoteControls();
-		}
-
 	}
  
 	public final void Update() {
@@ -482,12 +455,15 @@ public class GUI_Control {
 	public boolean DoMouseBtn(int btn, boolean down) {
 		return false;
 	}
-	
+
+    /**
+     * обработчик вращения колеса мыши
+     * @param isUp вверх?
+     * @param len сколько щелчков
+     * @return обработали ли?
+     */
 	public boolean DoMouseWheel(boolean isUp, int len) {
-		if (gui.isRoot(this)) 
-			return false;
-		else
-			return false;
+		return false;
 	}
 	
 	// обработчик апдейта

@@ -20,13 +20,11 @@ package a1.dialogs;
 import a1.Config;
 import a1.Lang;
 import a1.Main;
-import a1.gui.GUI;
-import a1.gui.GUI_Button;
-import a1.gui.GUI_Panel;
+import a1.gui.*;
 import a1.gui.GUI_Panel.RenderMode;
-import a1.gui.GUI_Window;
 import a1.net.NetLogin;
 import a1.net.Packet;
+import a1.utils.Resource;
 import org.newdawn.slick.Color;
 
 import java.util.ArrayList;
@@ -39,6 +37,7 @@ public class dlg_Chars extends Dialog {
 	public List<GUI_Button> buttons = new ArrayList<GUI_Button>();
 	public int last_char_id = 0;
 	GUI_Window wnd;
+    GUI_Texture gpl_logo;
 
 	static {
 		Dialog.AddType("dlg_chars", new DialogFactory() {
@@ -103,6 +102,12 @@ public class dlg_Chars extends Dialog {
 		wnd.SetSize(250, 100);
 		wnd.caption = Lang.getTranslate("login", "select_char");
 		wnd.resizeable = false;
+
+        gpl_logo = new GUI_Texture(GUI.getInstance().normal);
+        gpl_logo.setTexture(Resource.getTexture("gplv3logo"));
+        gpl_logo.SetSize(128, 32);
+
+        gpl_logo.SetPos(20, Config.getScreenHeight()-52);
 	}
 
 	public void DoHide() {
@@ -114,6 +119,8 @@ public class dlg_Chars extends Dialog {
 		dlg = null;
 		wnd.Unlink();
 		wnd = null;
+        gpl_logo.Unlink();
+        gpl_logo = null;
 	}
 
 	public static boolean Exist() {
